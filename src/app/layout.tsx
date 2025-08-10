@@ -14,12 +14,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Vinicius Rampazzo | Desenvolvedor Full Stack',
-  description: 'Desenvolvedor Full Stack especializado em React, Node.js e Segurança Cibernética. Criando soluções web modernas e seguras.',
+  description: 'Desenvolvedor Full Stack especializado em Desenvolvimento Web e Segurança Cibernética. Criando soluções web modernas e seguras.',
   keywords: ['desenvolvedor full stack', 'react', 'nodejs', 'typescript', 'segurança cibernética'],
   authors: [{ name: 'Vinicius Rampazzo' }],
   openGraph: {
     title: 'Vinicius Rampazzo | Desenvolvedor Full Stack',
-    description: 'Desenvolvedor Full Stack especializado em React, Node.js e Segurança Cibernética.',
+    description: 'Desenvolvedor Full Stack especializado em Desenvolvimento Web e Segurança Cibernética.',
     url: 'https://devrampazzo.com.br',
     siteName: 'DevRampazzo Portfolio',
     images: [
