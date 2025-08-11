@@ -115,13 +115,13 @@ export default function Home() {
       company: 'ImobiBrasil',
       role: 'Analista HelpDesk Nível 3',
       period: '2023 - Atualmente',
-      description: 'Sou líder do setor de hospedagem de e-mails corporativos, arquitetando soluções escaláveis, automações e desenvolvimento.'
+      description: 'Sou líder do setor de hospedagem de e-mails corporativos, arquitetando soluções escaláveis, automações e desenvolvimento em um dos maiores CRMs imobiliários do Brasil.'
     },
     {
       company: 'Guardiões Segurança Eletrônica',
       role: 'Analista de rede',
       period: '2023',
-      description: 'Pude aprender muito sobre redes e desenvolvimento de software, trabalhando em equipe com os demais colaboradores.'
+      description: 'Pude aprender muito sobre redes e desenvolvimento de software, trabalhando em equipe e contribuindo para o crecimento da empresa com os demais colaboradores.'
     },
     {
       company: 'Trybe',
@@ -381,7 +381,7 @@ export default function Home() {
           <h2 className={`text-4xl font-bold mb-16 text-center bg-gradient-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent transform transition-all duration-800 ${
             visibleSections.experience ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-            Experiência Profissional
+            Desenvolvimento Profissional
           </h2>
           
           <div className="max-w-4xl mx-auto">
