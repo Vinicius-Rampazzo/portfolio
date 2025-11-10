@@ -113,20 +113,26 @@ export default function Home() {
   const experiences: Experience[] = [
     {
       company: 'ImobiBrasil',
-      role: 'Analista HelpDesk Nível 3',
-      period: '2023 - Atualmente',
-      description: 'Sou líder do setor de hospedagem de e-mails corporativos, arquitetando soluções escaláveis, automações e desenvolvimento em um dos maiores CRMs imobiliários do Brasil.'
+      role: 'Analista Nível 4',
+      period: 'Atualmente',
+      description: 'Sou líder do setor de hospedagem na ImobiBrasil, arquitetando soluções escaláveis, automações e desenvolvimento em um dos maiores CRMs imobiliários do Brasil.'
+    },
+    {
+      company: 'FIAP',
+      role: 'Defesa Cibernética',
+      period: 'Formado em 2025',
+      description: 'Minha formação é alicerçada na excelência prática, consolidada por uma jornada intensa de Challenges na FIAP, com habilidades de um Ethical Hacking. O ponto alto foi a vitória no Next Brasil 2025, onde fui vice-campeão do CTF após a seleção de um projeto acadêmico de destaque, validando minha capacidade de inovar sob pressão.'
     },
     {
       company: 'Guardiões Segurança Eletrônica',
       role: 'Analista de rede',
       period: '2023',
-      description: 'Pude aprender muito sobre redes e desenvolvimento de software, trabalhando em equipe e contribuindo para o crecimento da empresa com os demais colaboradores.'
+      description: 'Pude aprender muito sobre redes, proteção de dados e segurança da empresa, trabalhando em equipe e contribuindo para o crecimento da empresa com os demais colaboradores.'
     },
     {
       company: 'Trybe',
       role: 'Desenvolvedor FullStack',
-      period: '2022',
+      period: 'Formado em 2022',
       description: 'Formado pela Trybe em 2022 através de uma jornada intensa de desafios e diversos projetos práticos que consolidaram minha base em programação.'
     }
   ];
@@ -214,11 +220,12 @@ export default function Home() {
             <div className="w-40 h-40 mx-auto mb-6 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 p-1 shadow-2xl shadow-emerald-500/25">
               <div className="w-full h-full rounded-full overflow-hidden border border-emerald-500/20">
                 <Image
-                  src="/images/profile.jpg"
+                  src="/images/profiles.jpg"
                   alt="Foto de perfil"
                   width={400}
                   height={400}
-                  className="w-full h-full object-cover rounded-full"
+                  className="w-90 h-90 object-cover rounded-full"
+                  style={{ objectPosition: '40% -90px' }}
                   priority
                   quality={95}
                 />
@@ -231,8 +238,8 @@ export default function Home() {
           </h1>
           
           <p className="text-lg md:text-2xl mb-8 text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Desenvolvedor <span className="text-emerald-400 font-semibold">Full Stack</span> apaixonado em tecnologia e segurança! 
-            Compartilho experiências digitais para <span className="text-emerald-400 font-semibold">conectar</span> pessoas.
+            <span className="text-emerald-400 font-semibold">Desenvolvedor Full Stack</span> apaixonado em <span className="text-emerald-400 font-semibold">Defesa Cibernética</span>! 
+            Compartilho experiências digitais para conectar pessoas.
           </p>
           
           <div className="flex flex-wrap gap-4 justify-center mb-12">
@@ -265,7 +272,7 @@ export default function Home() {
           <button className="group bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-emerald-500/30"
                   onClick={scrollToCertifications}>
             <span className="flex items-center">
-              Ver Meus Projetos
+              Ver Minhas Certificações
               <ChevronDown className="ml-2 w-5 h-5 group-hover:translate-y-1 transition-transform" />
             </span>
           </button>
