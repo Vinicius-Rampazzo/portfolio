@@ -1,63 +1,67 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Syne, Inter } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const syne = Syne({
+  variable: "--font-syne",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: 'Vinicius Rampazzo | Desenvolvedor Full Stack',
-  description: 'Desenvolvedor Full Stack especializado em Desenvolvimento Web e Segurança Cibernética. Criando soluções web modernas e seguras.',
-  keywords: ['desenvolvedor full stack', 'react', 'nodejs', 'typescript', 'segurança cibernética'],
-  authors: [{ name: 'Vinicius Rampazzo' }],
+  title: "Vinicius Rampazzo | Full Stack Dev & Cybersecurity",
+  description:
+    "Desenvolvedor Full Stack com foco em aplicações seguras, escaláveis e orientadas a performance. Node.js, React, Next.js, Python e Defesa Cibernética.",
+  keywords: [
+    "desenvolvedor full stack",
+    "cibersegurança",
+    "react",
+    "nodejs",
+    "typescript",
+    "ethical hacking",
+    "segurança de aplicações",
+    "next.js",
+    "python",
+  ],
+  authors: [{ name: "Vinicius Rampazzo" }],
   openGraph: {
-    title: 'Vinicius Rampazzo | Desenvolvedor Full Stack',
-    description: 'Desenvolvedor Full Stack especializado em Desenvolvimento Web e Segurança Cibernética.',
-    url: 'https://devrampazzo.com.br',
-    siteName: 'DevRampazzo Portfolio',
+    title: "Vinicius Rampazzo | Full Stack Dev & Cybersecurity",
+    description:
+      "Full Stack Dev com foco em Segurança. Node.js, React, Next.js, Python, Defesa Cibernética.",
+    url: "https://devrampazzo.com.br",
+    siteName: "DevRampazzo Portfolio",
     images: [
       {
-        url: '/images/preview.png',
+        url: "/images/preview.png",
         width: 1200,
         height: 630,
-        alt: 'Vinicius Rampazzo - Desenvolvedor Full Stack',
-      }
+        alt: "Vinicius Rampazzo — Full Stack Developer & Cybersecurity",
+      },
     ],
-    locale: 'pt_BR',
-    type: 'website',
+    locale: "pt_BR",
+    type: "website",
   },
   icons: {
-    icon: [
-      { url: '/favicon.ico' },
-      { url: '/icon.png', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/images/apple-icon.png', type: 'image/png' },
-    ],
+    icon: [{ url: "/favicon.ico" }, { url: "/icon.png", type: "image/png" }],
+    apple: [{ url: "/images/apple-icon.png", type: "image/png" }],
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="pt-BR">
+      <body className={`${syne.variable} ${inter.variable} antialiased`}>
         {children}
       </body>
     </html>
