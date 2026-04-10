@@ -16,11 +16,10 @@ import {
   ChevronRight,
   Shield,
   Code2,
-  Zap,
+  ArrowRight,
   Trophy,
   Building2,
-  ArrowRight,
-  Menu,
+  Zap,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -622,7 +621,7 @@ export default function Home() {
                 <div className="float-3 absolute left-[0%] sm:left-[15%] lg:left-[15%] bottom-[12%] lg:bottom-[15%] z-20 pointer-events-auto">
                   <div className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-surface border border-yellow-500/15 text-[10px] sm:text-xs text-yellow-400 shadow-[0_0_20px_rgba(0,0,0,0.5)] backdrop-blur-sm whitespace-nowrap">
                     <Trophy className="w-3.5 h-3.5" />
-                    1º Hackathon '25
+                    1º Hackathon &apos;25
                   </div>
                 </div>
 
@@ -756,7 +755,7 @@ export default function Home() {
       >
         {/* Floating code block decoration */}
         <div className="code-float absolute -right-2 top-16 opacity-[0.09] font-mono text-[11px] text-cyan-400 border border-cyan-400/[0.12] rounded-2xl p-5 bg-black/40 backdrop-blur-sm select-none pointer-events-none hidden xl:block" style={{lineHeight:'1.7'}}>
-          <div className="text-muted/40 text-[9px] mb-2 tracking-widest uppercase">// security_layer.ts</div>
+          <div className="text-muted/40 text-[9px] mb-2 tracking-widest uppercase">{"// security_layer.ts"}</div>
           <div><span className="text-blue-400/80">const</span> <span className="text-white/50">auditApp</span> = (target) =&gt; {'{'}</div>
           <div>&nbsp;&nbsp;analyze(target.endpoints);</div>
           <div>&nbsp;&nbsp;<span className="text-cyan-400/90">patch</span>(vulnerabilities);</div>
