@@ -404,9 +404,9 @@ export default function Home() {
             className="md:hidden relative w-10 h-10 flex flex-col items-center justify-center gap-[6px] z-[70]"
             aria-label="Toggle Menu"
           >
-            <span className={`block w-6 h-px bg-white transition-all duration-300 ease-out ${isMobileMenuOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
+            <span className={`block w-6 h-px bg-white opacity-100 transition-all duration-300 ease-out ${isMobileMenuOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
             <span className={`block w-6 h-px bg-white transition-all duration-300 ease-out ${isMobileMenuOpen ? 'opacity-0 translate-x-2' : 'opacity-100'}`} />
-            <span className={`block w-6 h-px bg-white transition-all duration-300 ease-out ${isMobileMenuOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
+            <span className={`block w-6 h-px bg-white opacity-100 transition-all duration-300 ease-out ${isMobileMenuOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
           </button>
         </div>
       </nav>
@@ -495,7 +495,7 @@ export default function Home() {
               <p className="flex items-center justify-center lg:justify-start text-[1rem] min-[400px]:text-[1.125rem] sm:text-lg md:text-2xl font-light text-muted tracking-wide mb-5 whitespace-nowrap">
                 Dev FullStack
                 <span className="text-cyan-400 mx-2 sm:mx-3 font-normal">·</span>
-                CyberSecurity&#8209;first
+                CyberSecurity&#8209;First
               </p>
 
               <p className="text-center lg:text-left text-muted/80 text-[15px] max-w-[480px] leading-relaxed mb-10 mx-auto lg:mx-0">
