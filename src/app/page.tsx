@@ -31,6 +31,7 @@ type Project = {
   demo: string;
   github: string;
   award?: string;
+  imagePosition?: string;
 };
 
 type Experience = {
@@ -179,6 +180,16 @@ export default function Home() {
       award: "1º Lugar Hackathon 2025",
     },
     {
+      title: "Doc Work",
+      description:
+        "Um projeto FullStack RAG desenvolvido para ajudar colaboradores de empresas com respostas rápidas com base em documentações internas das empresas, ainda em desenvolvimento, porém já em produção.",
+      tech: ["Next.js", "Tailwind CSS", "Python", "PostgreSQL"],
+      image: "/images/docwork.png",
+      demo: "https://www.docwork.com.br/",
+      github: "https://github.com/Vinicius-Rampazzo/support-service",
+      imagePosition: "top center",
+    },
+    {
       title: "Tech Informe",
       description:
         "Blog colaborativo para compartilhar conhecimento técnico. Múltiplos autores podem hospedar e publicar artigos sobre tecnologia de forma organizada.",
@@ -186,15 +197,6 @@ export default function Home() {
       image: "/images/techinforme.png",
       demo: "https://techinforme.com.br/",
       github: "https://techinforme.com.br/",
-    },
-    {
-      title: "Pixel Art",
-      description:
-        "Primeiro projeto desenvolvido na Trybe — onde tudo começou. HTML, CSS e JavaScript aplicados numa interface interativa de pixel art.",
-      tech: ["JavaScript", "CSS", "HTML"],
-      image: "/images/pixelart.png",
-      demo: "https://pixel-art-blush.vercel.app/",
-      github: "https://github.com/Vinicius-Rampazzo/pixel-art",
     },
   ];
 
@@ -1227,7 +1229,7 @@ export default function Home() {
 }
 
 // ─── ProjectCard ──────────────────────────────────────────────────────────────
-const ProjectCard = ({
+function ProjectCard({
   project,
   index,
   isVisible,
@@ -1235,78 +1237,98 @@ const ProjectCard = ({
   project: Project;
   index: number;
   isVisible: boolean;
-}) => (
-  <div
-    className={`group relative bg-surface border border-white/[0.06] rounded-2xl overflow-visible hover:border-cyan-400/25 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_24px_48px_rgba(0,0,0,0.5)] ${
-      isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-    }`}
-    style={{ transitionDelay: `${index * 120 + 200}ms` }}
-  >
-    {/* Award badge — floating above card, outside overflow */}
-    {project.award && (
-      <div className="absolute -top-4 left-4 z-20">
-        <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-yellow-400 text-black text-xs font-bold shadow-[0_4px_20px_rgba(250,204,21,0.35)]">
-          <Trophy className="w-3.5 h-3.5" />
-          {project.award}
-        </span>
-      </div>
-    )}
+}) {
+  const [ready, setReady] = useState(false);
 
-    {/* Image */}
-    <div className="relative overflow-hidden h-48 rounded-t-2xl">
-      <Image
-        src={project.image}
-        alt={project.title}
-        width={400}
-        height={250}
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
-    </div>
+  useEffect(() => {
+    if (!isVisible) return;
+    const t = setTimeout(() => setReady(true), index * 120 + 200 + 700);
+    return () => clearTimeout(t);
+  }, [isVisible, index]);
 
-    {/* Content */}
-    <div className="p-6">
-      <h3 className="font-display font-bold text-lg text-white mb-2 group-hover:text-cyan-400 transition-colors duration-300">
-        {project.title}
-      </h3>
-      <p className="text-muted text-sm leading-relaxed mb-4 line-clamp-3">
-        {project.description}
-      </p>
-
-      <div className="flex flex-wrap gap-1.5 mb-5">
-        {project.tech.map((tech, i) => (
-          <span
-            key={i}
-            className="px-2 py-1 bg-white/[0.04] border border-white/[0.06] rounded text-xs text-muted/70"
-          >
-            {tech}
+  return (
+    <div
+      className={`group relative transition-all duration-300 hover:scale-[1.02] ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+      }`}
+      style={{ transitionDelay: ready ? "0ms" : `${index * 120 + 200}ms` }}
+    >
+      {/* Award badge */}
+      {project.award && (
+        <div className="absolute -top-4 left-4 z-20">
+          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-yellow-400 text-black text-xs font-bold shadow-[0_4px_20px_rgba(250,204,21,0.35)]">
+            <Trophy className="w-3.5 h-3.5" />
+            {project.award}
           </span>
-        ))}
-      </div>
+        </div>
+      )}
 
-      <div className="flex gap-2.5">
-        <a
-          href={project.demo}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cyan-400/10 border border-cyan-400/20 text-cyan-400 text-xs font-medium hover:bg-cyan-400/20 transition-colors"
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-          Demo
-        </a>
-        <a
-          href={project.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-muted text-xs font-medium hover:bg-white/[0.08] hover:text-white transition-all"
-        >
-          <Github className="w-3.5 h-3.5" />
-          Código
-        </a>
+      {/* Inner card */}
+      <div
+        className="flex flex-col h-full overflow-hidden rounded-2xl bg-surface"
+        style={{
+          boxShadow: "0 0 0 1px rgba(255,255,255,0.06)",
+          willChange: "transform",
+          transform: "translateZ(0)",
+        }}
+      >
+        {/* Image */}
+        <div className="relative h-48 flex-shrink-0">
+          <Image
+            src={project.image}
+            alt={project.title}
+            width={400}
+            height={250}
+            className="w-full h-full object-cover"
+            style={{ objectPosition: project.imagePosition ?? "center center" }}
+          />
+        </div>
+
+        {/* Content */}
+        <div className="p-6 flex flex-col flex-1">
+          <h3 className="font-display font-bold text-lg text-white mb-2 group-hover:text-cyan-400 transition-colors duration-300">
+            {project.title}
+          </h3>
+          <p className="text-muted text-sm leading-relaxed mb-4 line-clamp-3">
+            {project.description}
+          </p>
+
+          <div className="flex flex-wrap gap-1.5 mb-5">
+            {project.tech.map((tech, i) => (
+              <span
+                key={i}
+                className="px-2 py-1 bg-white/[0.04] border border-white/[0.06] rounded text-xs text-muted/70"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex gap-2.5 mt-auto">
+            <a
+              href={project.demo}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cyan-400/10 border border-cyan-400/20 text-cyan-400 text-xs font-medium hover:bg-cyan-400/20 transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Demo
+            </a>
+            <a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-muted text-xs font-medium hover:bg-white/[0.08] hover:text-white transition-all"
+            >
+              <Github className="w-3.5 h-3.5" />
+              Código
+            </a>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+}
 
 // ─── MobileProjectCarousel ────────────────────────────────────────────────────
 const MobileProjectCarousel = ({
@@ -1317,8 +1339,10 @@ const MobileProjectCarousel = ({
   isVisible: boolean;
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const touchEndX = useRef(0);
+  const isDragging = useRef(false);
 
   const nextSlide = () =>
     setCurrentSlide((prev) => (prev + 1) % projects.length);
@@ -1326,15 +1350,27 @@ const MobileProjectCarousel = ({
     setCurrentSlide((prev) => (prev - 1 + projects.length) % projects.length);
   const goToSlide = (i: number) => setCurrentSlide(i);
 
-  const handleTouchStart = (e: React.TouchEvent) =>
-    setTouchStart(e.targetTouches[0].clientX);
-  const handleTouchMove = (e: React.TouchEvent) =>
-    setTouchEnd(e.targetTouches[0].clientX);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchStartY.current = e.targetTouches[0].clientY;
+    touchEndX.current = e.targetTouches[0].clientX;
+    isDragging.current = false;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+    const dx = Math.abs(touchStartX.current - touchEndX.current);
+    const dy = Math.abs(touchStartY.current - e.targetTouches[0].clientY);
+    // Só marca como drag se o movimento horizontal for dominante
+    if (dx > 10 && dx > dy) isDragging.current = true;
+  };
+
   const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const dist = touchStart - touchEnd;
-    if (dist > 50) nextSlide();
-    else if (dist < -50) prevSlide();
+    if (!isDragging.current) return; // foi um tap — deixa o clique acontecer
+    const dist = touchStartX.current - touchEndX.current;
+    if (dist > 60) nextSlide();
+    else if (dist < -60) prevSlide();
+    isDragging.current = false;
   };
 
   return (
@@ -1354,25 +1390,27 @@ const MobileProjectCarousel = ({
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
           {projects.map((project, i) => (
-            <div key={i} className="w-full flex-shrink-0">
+            <div key={i} className="w-full flex-shrink-0 relative pt-5">
+              {/* Badge igual ao desktop — flutuando acima do card */}
+              {project.award && (
+                <div className="absolute top-0 left-3 z-20">
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-yellow-400 text-black text-xs font-bold shadow-[0_4px_20px_rgba(250,204,21,0.35)]">
+                    <Trophy className="w-3.5 h-3.5" />
+                    {project.award}
+                  </span>
+                </div>
+              )}
+
               <div className="bg-surface border border-white/[0.06] rounded-2xl overflow-hidden">
-                <div className="relative h-52 overflow-hidden">
+                <div className="relative h-52">
                   <Image
                     src={project.image}
                     alt={project.title}
                     width={400}
                     height={220}
                     className="w-full h-full object-cover"
+                    style={{ objectPosition: project.imagePosition ?? "center center" }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent" />
-                  {project.award && (
-                    <div className="absolute top-3 left-3">
-                      <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yellow-400/15 border border-yellow-400/25 text-yellow-400 text-xs backdrop-blur-sm">
-                        <Trophy className="w-3 h-3" />
-                        {project.award}
-                      </span>
-                    </div>
-                  )}
                 </div>
                 <div className="p-5">
                   <h3 className="font-display font-bold text-lg text-white mb-2">
@@ -1381,7 +1419,7 @@ const MobileProjectCarousel = ({
                   <p className="text-muted text-sm leading-relaxed mb-4">
                     {project.description}
                   </p>
-                  <div className="flex flex-wrap gap-1.5 mb-4">
+                  <div className="flex flex-wrap gap-1.5 mb-5">
                     {project.tech.map((tech, ti) => (
                       <span
                         key={ti}
@@ -1391,23 +1429,26 @@ const MobileProjectCarousel = ({
                       </span>
                     ))}
                   </div>
-                  <div className="flex gap-2">
+                  {/* Botões maiores e mais fáceis de clicar no mobile */}
+                  <div className="flex gap-3">
                     <a
                       href={project.demo}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cyan-400/10 border border-cyan-400/20 text-cyan-400 text-xs font-medium"
+                      className="flex items-center justify-center gap-2 flex-1 py-3 rounded-xl bg-cyan-400/10 border border-cyan-400/20 text-cyan-400 text-sm font-medium active:bg-cyan-400/25 transition-colors"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      <ExternalLink className="w-4 h-4" />
                       Demo
                     </a>
                     <a
                       href={project.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-muted text-xs font-medium"
+                      className="flex items-center justify-center gap-2 flex-1 py-3 rounded-xl bg-white/[0.04] border border-white/[0.06] text-muted text-sm font-medium active:bg-white/10 transition-colors"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <Github className="w-3.5 h-3.5" />
+                      <Github className="w-4 h-4" />
                       Código
                     </a>
                   </div>
