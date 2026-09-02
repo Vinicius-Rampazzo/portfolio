@@ -17,25 +17,33 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Vinicius Rampazzo | Full Stack Dev & Cybersecurity",
+  // Sem isto o Next resolve a imagem de Open Graph para localhost no build.
+  metadataBase: new URL("https://devrampazzo.com.br"),
+  title: "Vinicius Rampazzo | Software Engineer · AI · SaaS",
   description:
-    "Desenvolvedor Full Stack com foco em aplicações seguras, escaláveis e orientadas a performance. Node.js, React, Next.js, Python e Defesa Cibernética.",
+    "Software Engineer especializado em aplicações SaaS, Inteligência Artificial, sistemas web escaláveis e soluções mobile offline-first.",
   keywords: [
-    "desenvolvedor full stack",
-    "cibersegurança",
-    "react",
-    "nodejs",
-    "typescript",
-    "ethical hacking",
-    "segurança de aplicações",
+    "software engineer",
+    "engenheiro de software",
+    "saas",
+    "inteligência artificial",
+    "rag",
+    "llm",
+    "offline-first",
+    "react native",
     "next.js",
+    "typescript",
+    "nodejs",
     "python",
+    "postgresql",
+    "arquitetura de software",
+    "cibersegurança",
   ],
   authors: [{ name: "Vinicius Rampazzo" }],
   openGraph: {
-    title: "Vinicius Rampazzo | Full Stack Dev & Cybersecurity",
+    title: "Vinicius Rampazzo — Software Engineer",
     description:
-      "Full Stack Dev com foco em Segurança. Node.js, React, Next.js, Python, Defesa Cibernética.",
+      "Engenharia de software, SaaS, Inteligência Artificial, aplicações offline-first e desenvolvimento seguro.",
     url: "https://devrampazzo.com.br",
     siteName: "DevRampazzo Portfolio",
     images: [
@@ -43,7 +51,7 @@ export const metadata: Metadata = {
         url: "/images/preview.png",
         width: 1200,
         height: 630,
-        alt: "Vinicius Rampazzo — Full Stack Developer & Cybersecurity",
+        alt: "Vinicius Rampazzo — Software Engineer · SaaS · AI · Offline-First",
       },
     ],
     locale: "pt_BR",
