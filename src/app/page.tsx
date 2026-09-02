@@ -20,25 +20,55 @@ import {
   Trophy,
   Building2,
   Zap,
+  Sparkles,
+  Smartphone,
+  GraduationCap,
+  EyeOff,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Project = {
   title: string;
+  category?: string;
   description: string;
   tech: string[];
   image: string;
   demo: string;
-  github: string;
+  github?: string;
   award?: string;
   imagePosition?: string;
 };
 
 type Experience = {
-  company: string;
+  /** Omitido quando o vínculo não pode ser identificado publicamente. */
+  company?: string;
   role: string;
   period: string;
+  /** Um parágrafo, ou vários quando a experiência precisa de mais contexto. */
+  description: string | string[];
+  tech?: string[];
+  current?: boolean;
+};
+
+type Education = {
+  institution: string;
+  course: string;
+  period: string;
   description: string;
+};
+
+// "Award" já é o nome de um ícone do lucide-react — daí "Achievement".
+type Achievement = {
+  place: string;
+  title: string;
+  event: string;
+  description: string;
+  accent: {
+    text: string;
+    border: string;
+    bg: string;
+  };
+  icon: React.ReactNode;
 };
 
 type Certification = {
@@ -61,12 +91,15 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // A ordem das chaves precisa espelhar a ordem visual das seções:
+  // o scroll-spy abaixo percorre este objeto e mantém a última seção já ultrapassada.
   const sectionRefs = {
     hero: useRef<HTMLElement>(null),
     value: useRef<HTMLElement>(null),
+    projects: useRef<HTMLElement>(null),
+    awards: useRef<HTMLElement>(null),
     about: useRef<HTMLElement>(null),
     skills: useRef<HTMLElement>(null),
-    projects: useRef<HTMLElement>(null),
     experience: useRef<HTMLElement>(null),
     certifications: useRef<HTMLElement>(null),
     contact: useRef<HTMLElement>(null),
@@ -122,67 +155,71 @@ export default function Home() {
   // ─── Data ────────────────────────────────────────────────────────────────────
   const skillGroups = [
     {
-      label: "Frontend",
+      label: "Software Engineering",
       headerClass:
         "bg-cyan-400/[0.08] text-cyan-400 border border-cyan-400/20",
       items: [
-        "Next.js",
-        "React",
         "TypeScript",
         "JavaScript",
-        "HTML & CSS",
-        "Tailwind CSS",
-      ],
-    },
-    {
-      label: "Backend",
-      headerClass:
-        "bg-blue-500/[0.08] text-blue-400 border border-blue-500/20",
-      items: [
         "Node.js",
         "Python",
-        "SQL",
         "REST APIs",
-        "PostgreSQL",
-        "MongoDB",
+        "Arquitetura de Software",
+        "Modelagem de Dados",
       ],
     },
     {
-      label: "Segurança",
+      label: "Web & Mobile",
+      headerClass:
+        "bg-blue-500/[0.08] text-blue-400 border border-blue-500/20",
+      items: ["Next.js", "React", "React Native", "Expo", "Tailwind CSS"],
+    },
+    {
+      label: "Data & Backend",
+      headerClass:
+        "bg-emerald-500/[0.08] text-emerald-400 border border-emerald-500/20",
+      items: ["PostgreSQL", "Supabase", "SQLite", "MongoDB", "SQL"],
+    },
+    {
+      label: "AI Engineering",
+      headerClass:
+        "bg-violet-500/[0.08] text-violet-400 border border-violet-500/20",
+      items: [
+        "RAG",
+        "LLM Integration",
+        "Semantic Search",
+        "Embeddings",
+        "Vector Search",
+        "Prompt Engineering",
+      ],
+    },
+    {
+      label: "Cloud & Infrastructure",
+      headerClass:
+        "bg-amber-500/[0.08] text-amber-400 border border-amber-500/20",
+      items: ["Git & GitHub", "Docker", "Linux", "Vercel", "Cloudflare", "VPS"],
+    },
+    {
+      label: "Security",
       headerClass:
         "bg-purple-500/[0.08] text-purple-400 border border-purple-500/20",
       items: [
+        "Application Security",
         "Análise de Vulnerabilidades",
-        "Nmap",
-        "SIEM",
-        "Ethical Hacking",
         "Gestão de Riscos",
+        "Secure Development",
+        "Nmap",
         "Forensics",
       ],
-    },
-    {
-      label: "Ferramentas",
-      headerClass:
-        "bg-emerald-500/[0.08] text-emerald-400 border border-emerald-500/20",
-      items: ["Git & GitHub", "Docker", "Linux", "Vercel", "CloudFlare", "PaaS (Platform as a Service)"],
     },
   ];
 
   const projects: Project[] = [
     {
-      title: "ImobiBotBrasil",
-      description:
-        "IA integrada com chatbot e filtro inteligente que facilita a busca por imóveis via conversas naturais. Projeto vencedor do Hackathon ImobiBrasil 2025.",
-      tech: ["Python", "JavaScript", "HTML", "CSS"],
-      image: "/images/imobibotbrasil.png",
-      demo: "https://github.com/Vinicius-Rampazzo/ImobiBotBrasil",
-      github: "https://github.com/Vinicius-Rampazzo/ImobiBotBrasil",
-      award: "1º Lugar Hackathon 2025",
-    },
-    {
       title: "Doc Work",
+      category: "AI · SaaS · RAG",
       description:
-        "Um projeto FullStack RAG desenvolvido para ajudar colaboradores de empresas com respostas rápidas com base em documentações internas das empresas, ainda em desenvolvimento, porém já em produção.",
+        "Plataforma SaaS multi-tenant baseada em RAG que transforma documentos e bases internas de conhecimento em uma interface inteligente de consulta, usando embeddings, busca semântica e modelos de linguagem para responder com o conhecimento de cada organização.",
       tech: ["Next.js", "Tailwind CSS", "Python", "PostgreSQL"],
       image: "/images/docwork.png",
       demo: "https://www.docwork.com.br/",
@@ -190,30 +227,54 @@ export default function Home() {
       imagePosition: "top center",
     },
     {
+      title: "ImobiBotBrasil",
+      category: "AI · Real Estate",
+      description:
+        "Solução que torna a busca por imóveis mais natural através de Inteligência Artificial: o usuário expressa o que precisa em linguagem natural em vez de depender apenas de filtros tradicionais, e a aplicação interpreta essa intenção para ajudar na descoberta de imóveis compatíveis.",
+      tech: ["Python", "JavaScript", "HTML", "CSS"],
+      image: "/images/imobibotbrasil.png",
+      demo: "https://github.com/Vinicius-Rampazzo/ImobiBotBrasil",
+      github: "https://github.com/Vinicius-Rampazzo/ImobiBotBrasil",
+      award: "1º Lugar Hackathon 2025",
+    },
+    {
       title: "Tech Informe",
+      category: "Blog · Conteúdo Técnico",
       description:
         "Blog colaborativo para compartilhar conhecimento técnico. Múltiplos autores podem hospedar e publicar artigos sobre tecnologia de forma organizada.",
-      tech: ["Blog", "Artigos", "Tecnologia"],
+      tech: ["Next.js", "Tailwind CSS"],
       image: "/images/techinforme.png",
       demo: "https://techinforme.com.br/",
-      github: "https://techinforme.com.br/",
     },
   ];
 
   const experiences: Experience[] = [
     {
-      company: "ImobiBrasil",
-      role: "Analista Nível 4",
-      period: "Atualmente",
-      description:
-        "Líder do setor de hospedagem num dos maiores CRMs imobiliários do Brasil. Arquiteto soluções escaláveis, automações críticas e garanto continuidade de serviços para múltiplos clientes em ambiente de alta demanda.",
+      // Empresa omitida: trabalho sob demanda, sem divulgação pública do vínculo.
+      role: "Software Engineer · PJ",
+      period: "Jun 2026 — Atual",
+      current: true,
+      description: [
+        "Desenvolvimento e evolução de plataformas voltadas ao setor rural, incluindo sistemas de crédito rural, assistência técnica e uma aplicação mobile utilizada diretamente em operações de campo.",
+        "A arquitetura offline-first permite que as informações sejam registradas localmente durante as atividades em regiões com conectividade limitada e sincronizadas com a infraestrutura remota assim que houver conexão disponível.",
+        "Atuo em arquitetura de software, modelagem de dados, integrações, persistência local, estratégias de sincronização e resolução de estados entre aplicação e servidor, mantendo a consistência dos dados entre os sistemas web e mobile.",
+      ],
+      tech: [
+        "React Native",
+        "Expo",
+        "TypeScript",
+        "SQLite",
+        "PostgreSQL",
+        "Supabase",
+      ],
     },
     {
-      company: "FIAP",
-      role: "Defesa Cibernética",
-      period: "Formado em 2025",
+      company: "ImobiBrasil",
+      role: "Analista Nível 4",
+      period: "Jun 2023 — Atual",
+      current: true,
       description:
-        "Formação intensiva com Challenges práticos e base sólida em Ethical Hacking. Vice-campeão do CTF no Next Brasil 2025, uma competição nacional de cibersegurança de alto nível, após seleção por projeto acadêmico.",
+        "Atuação em ambiente SaaS de alta demanda, auxiliando na resolução de incidentes técnicos, análise de problemas em produção, infraestrutura, automações e continuidade de serviços utilizados por múltiplos clientes do mercado imobiliário. O trabalho envolve investigação de falhas, suporte técnico avançado e análise de integrações que afetam diretamente a disponibilidade dos serviços.",
     },
     {
       company: "Guardiões Segurança Eletrônica",
@@ -222,12 +283,51 @@ export default function Home() {
       description:
         "Proteção de dados, gestão de redes e segurança corporativa. Trabalho direto com infraestrutura e integridade dos dados da empresa, em equipe.",
     },
+  ];
+
+  const achievements: Achievement[] = [
     {
-      company: "Trybe",
-      role: "Desenvolvedor FullStack",
+      place: "1º",
+      title: "Primeiro lugar",
+      event: "Hackathon ImobiBrasil 2025",
+      description:
+        "Projeto vencedor com o ImobiBotBrasil, solução de Inteligência Artificial que interpreta linguagem natural para tornar a busca por imóveis mais próxima de uma conversa do que de um formulário de filtros.",
+      accent: {
+        text: "text-yellow-400",
+        border: "hover:border-yellow-500/30",
+        bg: "bg-yellow-400/10",
+      },
+      icon: <Trophy className="w-6 h-6 text-yellow-400" />,
+    },
+    {
+      place: "2º",
+      title: "Vice-campeão",
+      event: "CTF Next Brasil 2025",
+      description:
+        "Competição nacional de cibersegurança de alto nível, com participação após seleção por projeto acadêmico. O desafio envolveu análise, exploração e resolução de problemas de segurança sob tempo limitado.",
+      accent: {
+        text: "text-purple-400",
+        border: "hover:border-purple-500/30",
+        bg: "bg-purple-500/10",
+      },
+      icon: <Award className="w-6 h-6 text-purple-400" />,
+    },
+  ];
+
+  const education: Education[] = [
+    {
+      institution: "FIAP",
+      course: "Defesa Cibernética",
+      period: "Formado em 2025",
+      description:
+        "Formação intensiva com Challenges práticos e base sólida em Ethical Hacking, análise de vulnerabilidades e resposta a incidentes, aplicada hoje à forma como projeto e desenvolvo software.",
+    },
+    {
+      institution: "Trybe",
+      course: "Desenvolvimento Web Full Stack",
       period: "Formado em 2022",
       description:
-        "Jornada prática e intensa de projetos que solidificaram a base full stack, do HTML ao Node.js, do banco de dados ao deploy em produção.",
+        "Jornada prática e intensa de projetos que solidificaram a base de engenharia, do front-end ao Node.js, do banco de dados ao deploy em produção.",
     },
   ];
 
@@ -301,42 +401,56 @@ export default function Home() {
       icon: <Code2 className="w-6 h-6 text-cyan-400" />,
       iconBg: "bg-cyan-400/10",
       border: "border-white/[0.06] hover:border-cyan-400/30",
-      title: "Desenvolvimento",
+      title: "Produto & Arquitetura",
       description:
-        "Node.js, React, Next.js e Python em produção real. Integração de sistemas, APIs REST, banco de dados. Código que aguenta carga, não só demos.",
+        "Desenvolvimento de sistemas pensando além da implementação: arquitetura, modelagem de dados, APIs, integrações, manutenção e evolução do produto em produção.",
       items: [
-        "Next.js & React",
-        "Node.js & Python",
+        "Arquitetura de Software",
+        "Modelagem de Dados",
         "APIs & Integrações",
-        "Performance em Produção - TRYBE",
+        "Evolução em Produção",
+      ],
+    },
+    {
+      icon: <Sparkles className="w-6 h-6 text-violet-400" />,
+      iconBg: "bg-violet-500/10",
+      border: "border-white/[0.06] hover:border-violet-500/30",
+      title: "Inteligência Artificial",
+      description:
+        "Construção de aplicações com LLMs, arquiteturas RAG, busca semântica e recuperação de informações integradas a produtos e fluxos reais de negócio.",
+      items: [
+        "RAG & LLMs",
+        "Busca Semântica",
+        "Embeddings & Vector Search",
+        "IA em Fluxos de Negócio",
+      ],
+    },
+    {
+      icon: <Smartphone className="w-6 h-6 text-emerald-400" />,
+      iconBg: "bg-emerald-500/10",
+      border: "border-white/[0.06] hover:border-emerald-500/30",
+      title: "Offline-First",
+      description:
+        "Aplicações mobile projetadas para ambientes com conectividade limitada, com persistência local, sincronização remota e consistência dos dados.",
+      items: [
+        "React Native & Expo",
+        "Persistência Local",
+        "Sincronização de Dados",
+        "Consistência entre Estados",
       ],
     },
     {
       icon: <Shield className="w-6 h-6 text-blue-400" />,
       iconBg: "bg-blue-500/10",
       border: "border-white/[0.06] hover:border-blue-500/30",
-      title: "Segurança",
+      title: "Security by Design",
       description:
-        "Análise de vulnerabilidades, gestão de riscos, Nmap e SIEM. Formado em Defesa Cibernética pela FIAP, com base prática em Ethical Hacking.",
+        "Formação em CyberSecurity que complementa a engenharia, com visão voltada à segurança das aplicações, infraestrutura, análise de riscos e confiabilidade.",
       items: [
+        "Application Security",
         "Análise de Vulnerabilidades",
-        "Forensics",
         "Gestão de Riscos",
-        "Ethical Hacking — FIAP",
-      ],
-    },
-    {
-      icon: <Zap className="w-6 h-6 text-yellow-400" />,
-      iconBg: "bg-yellow-400/10",
-      border: "border-white/[0.06] hover:border-yellow-500/30",
-      title: "Ambiente Real",
-      description:
-        "Liderança técnica em ambiente corporativo de alta demanda. Resolução de incidentes críticos e garantia de continuidade para múltiplos clientes.",
-      items: [
-        "Liderança Técnica",
-        "Incidentes Críticos",
-        "Multi-clientes",
-        "Alta Demanda Corporativa",
+        "Defesa Cibernética — FIAP",
       ],
     },
   ];
@@ -356,13 +470,14 @@ export default function Home() {
             // style={{ filter: 'invert(1) hue-rotate(180deg) brightness(6)' }}
             priority
           />
-          <div className="hidden md:flex items-center gap-7 text-sm">
+          <div className="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-7 text-[13px] lg:text-sm">
             {([
               { href: "#hero", label: "Início", section: "hero" },
-              { href: "#value", label: "Diferencial", section: "value" },
+              { href: "#value", label: "Engenharia", section: "value" },
+              { href: "#projects", label: "Projetos", section: "projects" },
+              { href: "#awards", label: "Premiações", section: "awards" },
               { href: "#about", label: "Sobre", section: "about" },
               { href: "#skills", label: "Skills", section: "skills" },
-              { href: "#projects", label: "Projetos", section: "projects" },
               { href: "#experience", label: "Experiência", section: "experience" },
             ] as { href: string; label: string; section: string }[]).map(
               ({ href, label, section }) => (
@@ -427,10 +542,11 @@ export default function Home() {
           <div className="flex flex-col items-center gap-8 w-full">
             {([
               { href: "#hero", label: "Início", section: "hero" },
-              { href: "#value", label: "Diferencial", section: "value" },
+              { href: "#value", label: "Engenharia", section: "value" },
+              { href: "#projects", label: "Projetos", section: "projects" },
+              { href: "#awards", label: "Premiações", section: "awards" },
               { href: "#about", label: "Sobre", section: "about" },
               { href: "#skills", label: "Skills", section: "skills" },
-              { href: "#projects", label: "Projetos", section: "projects" },
               { href: "#experience", label: "Experiência", section: "experience" },
             ] as { href: string; label: string; section: string }[]).map(({ href, label, section }) => (
               <a
@@ -492,27 +608,31 @@ export default function Home() {
                 <span className="w-full text-center lg:text-left text-gradient whitespace-nowrap">Rampazzo</span>
               </h1>
 
-              <p className="flex items-center justify-center lg:justify-start text-[1rem] min-[400px]:text-[1.125rem] sm:text-lg md:text-2xl font-light text-muted tracking-wide mb-5 whitespace-nowrap">
-                Dev FullStack
-                <span className="text-cyan-400 mx-2 sm:mx-3 font-normal">·</span>
-                CyberSecurity&#8209;First
+              <p className="flex flex-wrap items-center justify-center lg:justify-start gap-x-1.5 sm:gap-x-2.5 text-[0.95rem] min-[400px]:text-[1.0625rem] sm:text-lg md:text-xl xl:text-2xl font-light text-muted tracking-wide mb-5">
+                <span className="whitespace-nowrap">Software Engineer</span>
+                <span className="text-cyan-400 font-normal">·</span>
+                <span>SaaS</span>
+                <span className="text-cyan-400 font-normal">·</span>
+                <span>AI</span>
+                <span className="text-cyan-400 font-normal">·</span>
+                <span className="whitespace-nowrap">Offline&#8209;First</span>
               </p>
 
               <p className="text-center lg:text-left text-muted/80 text-[15px] max-w-[480px] leading-relaxed mb-10 mx-auto lg:mx-0">
-                Construo aplicações seguras, escaláveis e orientadas a
-                performance. A combinação entre desenvolvimento e segurança é o
-                que me diferencia. Não é só código limpo, é código que aguenta
-                o mundo real.
+                Construo produtos digitais escaláveis, plataformas SaaS,
+                aplicações com Inteligência Artificial e soluções mobile
+                offline-first, combinando engenharia de software, arquitetura e
+                segurança para resolver problemas reais de negócio.
               </p>
 
               <div className="flex flex-wrap justify-center lg:justify-start gap-2 mb-10 w-full">
                 {[
-                  "Node.js",
-                  "React",
-                  "Next.js",
-                  "Python",
                   "TypeScript",
-                  "CyberSec",
+                  "Node.js",
+                  "Next.js",
+                  "React Native",
+                  "Python",
+                  "PostgreSQL",
                 ].map((tech) => (
                   <span
                     key={tech}
@@ -608,15 +728,15 @@ export default function Home() {
                 {/* Badges limitadas ao retângulo fixo flexível, garantindo alinhamento constante com a foto! */}
                 <div className="float-1 absolute left-[-10px] sm:left-[5%] lg:left-[5%] top-[10%] lg:top-[12%] z-20 pointer-events-auto">
                   <div className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-surface border border-cyan-400/15 text-[10px] sm:text-xs text-cyan-400 shadow-[0_0_20px_rgba(0,0,0,0.5)] backdrop-blur-sm whitespace-nowrap">
-                    <Shield className="w-3.5 h-3.5" />
-                    CyberSecurity
+                    <Zap className="w-3.5 h-3.5" />
+                    SaaS &middot; AI
                   </div>
                 </div>
 
                 <div className="float-2 absolute right-[-10px] sm:right-[5%] lg:right-[10%] top-[25%] lg:top-[28%] z-20 pointer-events-auto">
                   <div className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-surface border border-blue-500/15 text-[10px] sm:text-xs text-blue-400 shadow-[0_0_20px_rgba(0,0,0,0.5)] backdrop-blur-sm whitespace-nowrap">
-                    <Code2 className="w-3.5 h-3.5" />
-                    Full Stack
+                    <Smartphone className="w-3.5 h-3.5" />
+                    Offline-First
                   </div>
                 </div>
 
@@ -696,24 +816,25 @@ export default function Home() {
             }`}
           >
             <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-4">
-              O Diferencial
+              Áreas de Atuação
             </p>
             <h2 className="font-display font-bold text-4xl md:text-5xl text-white mb-5 leading-tight">
-              Dev que entende de segurança
+              Engenharia
               <br />
-              <span className="text-muted font-light">Destaque</span>
+              <span className="text-muted font-light">além do código</span>
             </h2>
-            <p className="text-muted text-sm max-w-lg mx-auto leading-relaxed">
-              A maioria entrega código que funciona. Eu entrego código que
-              funciona, resiste a ataques e se mantém de pé em produção.
+            <p className="text-muted text-sm max-w-xl mx-auto leading-relaxed">
+              Minha atuação combina desenvolvimento de software, arquitetura,
+              Inteligência Artificial, aplicações offline-first e segurança para
+              construir produtos preparados para ambientes e problemas reais.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {valueCards.map((card, i) => (
               <div
                 key={i}
-                className={`bg-base border ${card.border} rounded-2xl p-8 transition-all duration-700 hover:-translate-y-1.5 ${
+                className={`flex flex-col h-full bg-base border ${card.border} rounded-2xl p-6 xl:p-7 transition-all duration-700 hover:-translate-y-1.5 ${
                   visibleSections.value
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-10"
@@ -721,17 +842,19 @@ export default function Home() {
                 style={{ transitionDelay: `${i * 120 + 150}ms` }}
               >
                 <div
-                  className={`${card.iconBg} w-12 h-12 rounded-xl flex items-center justify-center mb-6`}
+                  className={`${card.iconBg} w-12 h-12 rounded-xl flex items-center justify-center mb-6 flex-shrink-0`}
                 >
                   {card.icon}
                 </div>
-                <h3 className="font-display font-bold text-lg text-white mb-3">
+                {/* Altura reservada para 2 linhas: títulos de tamanhos diferentes
+                    não desalinham a descrição e a lista entre os cards. */}
+                <h3 className="font-display font-bold text-lg text-white mb-3 sm:min-h-[3.5rem]">
                   {card.title}
                 </h3>
-                <p className="text-muted text-sm leading-relaxed mb-6">
+                <p className="text-muted text-sm leading-relaxed mb-6 flex-1">
                   {card.description}
                 </p>
-                <ul className="space-y-2">
+                <ul className="space-y-2 flex-shrink-0">
                   {card.items.map((item) => (
                     <li
                       key={item}
@@ -742,179 +865,6 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── About ───────────────────────────────────────────────────────────── */}
-      <section
-        ref={sectionRefs.about}
-        data-section="about"
-        id="about"
-        className="py-24 bg-base relative overflow-hidden"
-      >
-        {/* Floating code block decoration */}
-        <div className="code-float absolute -right-2 top-16 opacity-[0.09] font-mono text-[11px] text-cyan-400 border border-cyan-400/[0.12] rounded-2xl p-5 bg-black/40 backdrop-blur-sm select-none pointer-events-none hidden xl:block" style={{lineHeight:'1.7'}}>
-          <div className="text-muted/40 text-[9px] mb-2 tracking-widest uppercase">{"// security_layer.ts"}</div>
-          <div><span className="text-blue-400/80">const</span> <span className="text-white/50">auditApp</span> = (target) =&gt; {'{'}</div>
-          <div>&nbsp;&nbsp;analyze(target.endpoints);</div>
-          <div>&nbsp;&nbsp;<span className="text-cyan-400/90">patch</span>(vulnerabilities);</div>
-          <div>&nbsp;&nbsp;<span className="text-blue-400/80">return</span> <span className="text-emerald-400/70">secured</span>(target);</div>
-          <div className="text-white/40">{'}'}</div>
-          <div className="mt-2 text-muted/30 text-[9px]">✓ 0 vulnerabilities detected</div>
-        </div>
-        <div className="max-w-6xl mx-auto px-6">
-          {/* Centered section header */}
-          <div
-            className={`text-center mb-16 transition-all duration-700 ${
-              visibleSections.about
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
-            }`}
-          >
-            <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-4">
-              Sobre Mim
-            </p>
-            <h2 className="font-display font-bold text-4xl md:text-5xl text-white leading-tight">
-              Além do código
-            </h2>
-          </div>
-
-          <div className="grid lg:grid-cols-[1fr_340px] gap-16 items-start">
-            {/* Text */}
-            <div
-              className={`transition-all duration-700 delay-100 ${
-                visibleSections.about
-                  ? "opacity-100 translate-x-0"
-                  : "opacity-0 -translate-x-8"
-              }`}
-            >
-
-              <div className="space-y-5 text-muted leading-relaxed text-[15px]">
-                <p>
-                  Sou desenvolvedor Full Stack com foco em aplicações seguras,
-                  escaláveis e orientadas a performance. Trabalho com Node.js,
-                  React, Next.js e Python, tecnologias que escolho porque
-                  resolvem problemas reais, não porque estão na moda.
-                </p>
-                <p>
-                  Tenho experiência prática com infraestrutura e segurança de
-                  aplicações: análise de vulnerabilidades, gestão de riscos,
-                  Nmap e SIEM. Isso me permite desenvolver com uma visão que vai
-                  além do código, porque proteger uma aplicação começa antes do
-                  deploy.
-                </p>
-                <p>
-                  Atualmente lidero a resolução de incidentes críticos em
-                  ambiente corporativo de alta demanda, garantindo continuidade
-                  de serviços para múltiplos clientes. Primeiro lugar no
-                  Hackathon ImobiBrasil 2025. Vice-campeão do CTF no Next Brasil
-                  2025.
-                </p>
-                <p className="text-white/60 border-l-2 border-cyan-400/30 pl-4 italic">
-                  Se precisar de alguém que escreve bons códigos e sabe o que um
-                  atacante faria com ele, é aqui.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 mt-8 text-xs text-muted/60">
-                <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-                Presidente Prudente — SP, Brasil
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div
-              className={`transition-all duration-700 delay-300 ${
-                visibleSections.about
-                  ? "opacity-100 translate-x-0"
-                  : "opacity-0 translate-x-8"
-              }`}
-            >
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { value: "4+", label: "Anos de\nExperiência" },
-                  { value: "8", label: "Certificações\nObtidas" },
-                  { value: "1º", label: "Hackathon\nImobiBrasil 2025" },
-                  { value: "2º", label: "CTF Next\nBrasil 2025" },
-                ].map((stat, i) => (
-                  <div
-                    key={i}
-                    className="bg-surface border border-white/[0.06] rounded-2xl p-6 text-center hover:border-cyan-400/20 transition-all duration-300 group"
-                  >
-                    <div className="font-display font-extrabold text-4xl text-white mb-2 group-hover:text-cyan-400 transition-colors duration-300">
-                      {stat.value}
-                    </div>
-                    <div className="text-xs text-muted leading-snug whitespace-pre-line">
-                      {stat.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Skills ──────────────────────────────────────────────────────────── */}
-      <section
-        ref={sectionRefs.skills}
-        data-section="skills"
-        id="skills"
-        className="py-24 bg-surface relative overflow-hidden"
-      >
-        {/* Subtle dot grid overlay */}
-        <div className="dot-grid absolute inset-0 opacity-30 pointer-events-none" />
-        {/* Ambient orbs */}
-        <div className="absolute top-1/2 -translate-y-1/2 -left-32 w-80 h-80 bg-cyan-400/[0.04] rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/[0.04] rounded-full blur-3xl pointer-events-none" />
-        <div className="max-w-6xl mx-auto px-6 relative z-10">
-          <div
-            className={`text-center mb-16 transition-all duration-700 ${
-              visibleSections.skills
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
-            }`}
-          >
-            <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-4">
-              Stack Técnica
-            </p>
-            <h2 className="font-display font-bold text-4xl md:text-5xl text-white leading-tight">
-              O que uso
-              <br />
-              <span className="text-muted font-light">Atualmente</span>
-            </h2>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
-            {skillGroups.map((col, i) => (
-              <div
-                key={col.label}
-                className={`transition-all duration-700 ${
-                  visibleSections.skills
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-10"
-                }`}
-                style={{ transitionDelay: `${i * 80 + 200}ms` }}
-              >
-                <div
-                  className={`${col.headerClass} px-4 py-2.5 rounded-t-xl text-xs font-semibold tracking-widest uppercase text-center`}
-                >
-                  {col.label}
-                </div>
-                <div className="bg-base border border-t-0 border-white/[0.06] rounded-b-xl p-3 space-y-0.5 min-h-[220px]">
-                  {col.items.map((item) => (
-                    <div
-                      key={item}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-muted hover:bg-white/[0.04] hover:text-white/80 transition-all duration-200 group cursor-default"
-                    >
-                      <span className="w-1 h-1 rounded-full bg-white/20 group-hover:bg-cyan-400 transition-colors duration-200 flex-shrink-0" />
-                      {item}
-                    </div>
-                  ))}
-                </div>
               </div>
             ))}
           </div>
@@ -975,12 +925,266 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Awards ──────────────────────────────────────────────────────────── */}
+      <section
+        ref={sectionRefs.awards}
+        data-section="awards"
+        id="awards"
+        className="py-24 bg-surface relative overflow-hidden"
+      >
+        {/* Ambient orbs */}
+        <div className="absolute -top-24 left-1/4 w-80 h-80 bg-yellow-400/[0.035] rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-purple-500/[0.04] rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <div
+            className={`text-center mb-16 transition-all duration-700 ${
+              visibleSections.awards
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-8"
+            }`}
+          >
+            <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-4">
+              Conquistas
+            </p>
+            <h2 className="font-display font-bold text-4xl md:text-5xl text-white">
+              Premiações
+            </h2>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-5 max-w-4xl mx-auto">
+            {achievements.map((item, index) => (
+              <div
+                key={item.event}
+                className={`flex flex-col h-full bg-base border border-white/[0.06] ${item.accent.border} rounded-2xl p-6 xl:p-7 transition-all duration-700 hover:-translate-y-1.5 ${
+                  visibleSections.awards
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}
+                style={{ transitionDelay: `${index * 120 + 150}ms` }}
+              >
+                <div className="flex items-center gap-4 mb-5">
+                  <div
+                    className={`${item.accent.bg} w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0`}
+                  >
+                    {item.icon}
+                  </div>
+                  <span
+                    className={`font-display font-extrabold text-4xl ${item.accent.text}`}
+                  >
+                    {item.place}
+                  </span>
+                </div>
+
+                <h3 className="font-display font-bold text-lg text-white mb-1">
+                  {item.title}
+                </h3>
+                <p className="text-cyan-400 text-sm font-medium mb-4">
+                  {item.event}
+                </p>
+                <p className="text-muted text-sm leading-relaxed flex-1">
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── About ───────────────────────────────────────────────────────────── */}
+      <section
+        ref={sectionRefs.about}
+        data-section="about"
+        id="about"
+        className="py-24 bg-base relative overflow-hidden"
+      >
+        {/* Floating code block decoration */}
+        <div className="code-float absolute -right-2 top-16 opacity-[0.09] font-mono text-[11px] text-cyan-400 border border-cyan-400/[0.12] rounded-2xl p-5 bg-black/40 backdrop-blur-sm select-none pointer-events-none hidden xl:block" style={{lineHeight:'1.7'}}>
+          <div className="text-muted/40 text-[9px] mb-2 tracking-widest uppercase">{"// build_product.ts"}</div>
+          <div><span className="text-blue-400/80">const</span> <span className="text-white/50">buildProduct</span> = <span className="text-blue-400/80">async</span> () =&gt; {'{'}</div>
+          <div>&nbsp;&nbsp;<span className="text-blue-400/80">const</span> architecture = <span className="text-cyan-400/90">designForScale</span>();</div>
+          <div>&nbsp;&nbsp;<span className="text-blue-400/80">const</span> intelligence = <span className="text-cyan-400/90">integrateAI</span>();</div>
+          <div>&nbsp;&nbsp;<span className="text-blue-400/80">const</span> experience = <span className="text-cyan-400/90">offlineFirst</span>();</div>
+          <div className="h-2" />
+          <div>&nbsp;&nbsp;<span className="text-blue-400/80">return</span> <span className="text-emerald-400/70">ship</span>({'{'}</div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;architecture, intelligence, experience,</div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;secureByDesign: <span className="text-emerald-400/70">true</span>,</div>
+          <div>&nbsp;&nbsp;{'}'});</div>
+          <div className="text-white/40">{'}'}</div>
+        </div>
+        <div className="max-w-6xl mx-auto px-6">
+          {/* Centered section header */}
+          <div
+            className={`text-center mb-16 transition-all duration-700 ${
+              visibleSections.about
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-8"
+            }`}
+          >
+            <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-4">
+              Sobre Mim
+            </p>
+            <h2 className="font-display font-bold text-4xl md:text-5xl text-white leading-tight">
+              Além do código
+            </h2>
+          </div>
+
+          <div className="grid lg:grid-cols-[1fr_340px] gap-16 items-start">
+            {/* Text */}
+            <div
+              className={`transition-all duration-700 delay-100 ${
+                visibleSections.about
+                  ? "opacity-100 translate-x-0"
+                  : "opacity-0 -translate-x-8"
+              }`}
+            >
+
+              <div className="space-y-5 text-muted leading-relaxed text-[15px]">
+                <p>
+                  Sou Engenheiro de Software com foco na construção de
+                  aplicações escaláveis, plataformas SaaS, soluções com
+                  Inteligência Artificial e aplicações mobile offline-first.
+                </p>
+                <p>
+                  Atuo no desenvolvimento e evolução de produtos digitais em
+                  diferentes contextos de negócio, com experiência em serviços
+                  financeiros, plataformas de crédito rural e soluções
+                  tecnológicas voltadas à assistência técnica no campo.
+                </p>
+                <p>
+                  Trabalho principalmente com TypeScript, Node.js, Next.js,
+                  React, React Native, Python e PostgreSQL, participando de
+                  decisões relacionadas à arquitetura, modelagem de dados, APIs,
+                  integrações, sincronização de informações e evolução dos
+                  sistemas em produção.
+                </p>
+                <p>
+                  Minha experiência também envolve aplicações baseadas em
+                  Inteligência Artificial, incluindo arquiteturas RAG, busca
+                  semântica, integração com modelos de linguagem e soluções
+                  multi-tenant.
+                </p>
+                <p>
+                  Minha formação em CyberSecurity complementa minha atuação em
+                  engenharia, trazendo uma visão voltada à segurança,
+                  infraestrutura, disponibilidade e confiabilidade das
+                  aplicações.
+                </p>
+                <p className="text-white/60 border-l-2 border-cyan-400/30 pl-4 italic">
+                  Mais do que implementar funcionalidades, busco compreender os
+                  objetivos de negócio e transformá-los em soluções técnicas
+                  sustentáveis, capazes de resolver problemas reais.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 mt-8 text-xs text-muted/60">
+                <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+                Presidente Prudente — SP, Brasil
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div
+              className={`transition-all duration-700 delay-300 ${
+                visibleSections.about
+                  ? "opacity-100 translate-x-0"
+                  : "opacity-0 translate-x-8"
+              }`}
+            >
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { value: "4+", label: "Anos em\nTecnologia" },
+                  { value: "8", label: "Certificações\nObtidas" },
+                  { value: "3", label: "Projetos\nPublicados" },
+                  { value: "2", label: "Premiações\nTécnicas" },
+                ].map((stat, i) => (
+                  <div
+                    key={i}
+                    className="bg-surface border border-white/[0.06] rounded-2xl p-6 text-center hover:border-cyan-400/20 transition-all duration-300 group"
+                  >
+                    <div className="font-display font-extrabold text-4xl text-white mb-2 group-hover:text-cyan-400 transition-colors duration-300">
+                      {stat.value}
+                    </div>
+                    <div className="text-xs text-muted leading-snug whitespace-pre-line">
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Skills ──────────────────────────────────────────────────────────── */}
+      <section
+        ref={sectionRefs.skills}
+        data-section="skills"
+        id="skills"
+        className="py-24 bg-surface relative overflow-hidden"
+      >
+        {/* Subtle dot grid overlay */}
+        <div className="dot-grid absolute inset-0 opacity-30 pointer-events-none" />
+        {/* Ambient orbs */}
+        <div className="absolute top-1/2 -translate-y-1/2 -left-32 w-80 h-80 bg-cyan-400/[0.04] rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/[0.04] rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <div
+            className={`text-center mb-16 transition-all duration-700 ${
+              visibleSections.skills
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-8"
+            }`}
+          >
+            <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-4">
+              Stack Técnica
+            </p>
+            <h2 className="font-display font-bold text-4xl md:text-5xl text-white leading-tight">
+              Competências
+              <br />
+              <span className="text-muted font-light">de Engenharia</span>
+            </h2>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+            {skillGroups.map((col, i) => (
+              <div
+                key={col.label}
+                className={`transition-all duration-700 ${
+                  visibleSections.skills
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}
+                style={{ transitionDelay: `${i * 80 + 200}ms` }}
+              >
+                <div
+                  className={`${col.headerClass} px-4 py-2.5 rounded-t-xl text-xs font-semibold tracking-widest uppercase text-center`}
+                >
+                  {col.label}
+                </div>
+                <div className="bg-base border border-t-0 border-white/[0.06] rounded-b-xl p-3 space-y-0.5 min-h-[220px]">
+                  {col.items.map((item) => (
+                    <div
+                      key={item}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-muted hover:bg-white/[0.04] hover:text-white/80 transition-all duration-200 group cursor-default"
+                    >
+                      <span className="w-1 h-1 rounded-full bg-white/20 group-hover:bg-cyan-400 transition-colors duration-200 flex-shrink-0" />
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Experience ──────────────────────────────────────────────────────── */}
       <section
         ref={sectionRefs.experience}
         data-section="experience"
         id="experience"
-        className="py-24 bg-surface relative overflow-hidden"
+        className="py-24 bg-base relative overflow-hidden"
       >
         {/* Circuit lines decoration top-right */}
         <svg className="absolute top-0 right-0 w-80 h-80 pointer-events-none select-none" viewBox="0 0 300 300" fill="none" opacity="0.07">
@@ -1007,7 +1211,7 @@ export default function Home() {
               Trajetória
             </p>
             <h2 className="font-display font-bold text-4xl md:text-5xl text-white">
-              Desenvolvimento Profissional
+              Experiência Profissional
             </h2>
           </div>
 
@@ -1024,13 +1228,13 @@ export default function Home() {
               >
                 {/* Timeline dot + line */}
                 <div className="flex flex-col items-center">
-                  <div className="w-9 h-9 rounded-full bg-base border-2 border-cyan-400/25 flex items-center justify-center flex-shrink-0 shadow-[0_0_16px_rgba(34,211,238,0.08)]">
+                  <div className="w-9 h-9 rounded-full bg-surface border-2 border-cyan-400/25 flex items-center justify-center flex-shrink-0 shadow-[0_0_16px_rgba(34,211,238,0.08)]">
                     <Building2 className="w-4 h-4 text-cyan-400" />
                   </div>
                   {index < experiences.length - 1 && (
                     <div className="relative flex-1 mt-2" style={{ minHeight: "32px" }}>
                       <div className="w-px h-full bg-gradient-to-b from-cyan-400/20 to-transparent" />
-                      {index === 0 && (
+                      {exp.current && (
                         <div className="timeline-travel absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
                       )}
                     </div>
@@ -1038,21 +1242,53 @@ export default function Home() {
                 </div>
 
                 {/* Card */}
-                <div className="flex-1 bg-base border border-white/[0.06] rounded-xl p-6 hover:border-cyan-400/20 transition-all duration-300 mb-5 last:mb-0">
+                <div className="flex-1 bg-surface border border-white/[0.06] rounded-xl p-6 hover:border-cyan-400/20 transition-all duration-300 mb-5 last:mb-0">
                   <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                     <div>
                       <h3 className="font-semibold text-white">{exp.role}</h3>
-                      <p className="text-cyan-400 text-sm font-medium">
-                        {exp.company}
-                      </p>
+                      {exp.company ? (
+                        <p className="text-cyan-400 text-sm font-medium">
+                          {exp.company}
+                        </p>
+                      ) : (
+                        <p className="flex items-center gap-1.5 text-muted/60 text-sm italic">
+                          <EyeOff className="w-3.5 h-3.5 flex-shrink-0" />
+                          Empresa não divulgada
+                        </p>
+                      )}
                     </div>
-                    <span className="text-xs text-muted border border-white/[0.08] bg-white/[0.03] px-3 py-1 rounded-full">
-                      {exp.period}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {exp.current && (
+                        <span className="flex items-center gap-1.5 text-[10px] font-semibold tracking-widest uppercase text-cyan-400 border border-cyan-400/25 bg-cyan-400/[0.08] px-2.5 py-1 rounded-full">
+                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                          Atual
+                        </span>
+                      )}
+                      <span className="text-xs text-muted border border-white/[0.08] bg-white/[0.03] px-3 py-1 rounded-full">
+                        {exp.period}
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-muted text-sm leading-relaxed mt-3">
-                    {exp.description}
-                  </p>
+                  <div className="space-y-3 text-muted text-sm leading-relaxed mt-3">
+                    {(Array.isArray(exp.description)
+                      ? exp.description
+                      : [exp.description]
+                    ).map((paragraph, pi) => (
+                      <p key={pi}>{paragraph}</p>
+                    ))}
+                  </div>
+                  {exp.tech && (
+                    <div className="flex flex-wrap gap-1.5 mt-4">
+                      {exp.tech.map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-2 py-1 bg-white/[0.04] border border-white/[0.06] rounded text-xs text-muted/70"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -1065,7 +1301,7 @@ export default function Home() {
         ref={sectionRefs.certifications}
         data-section="certifications"
         id="certifications"
-        className="py-24 bg-base relative overflow-hidden"
+        className="py-24 bg-surface relative overflow-hidden"
       >
         {/* Rotating hex decoration */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none">
@@ -1092,8 +1328,51 @@ export default function Home() {
             </p>
             <h2 className="font-display font-bold text-4xl md:text-5xl text-white flex items-center justify-center gap-3">
               <Award className="w-9 h-9 text-cyan-400" />
-              Certificações
+              Formação e Certificações
             </h2>
+            <p className="text-muted text-sm max-w-xl mx-auto leading-relaxed mt-5">
+              Uma base de engenharia somada a uma formação em CyberSecurity, que
+              complementa a forma como projeto e desenvolvo software.
+            </p>
+          </div>
+
+          {/* Formação acadêmica */}
+          <div className="grid sm:grid-cols-2 gap-4 max-w-4xl mx-auto mb-14">
+            {education.map((item, index) => (
+              <div
+                key={item.institution}
+                className={`flex flex-col h-full bg-base border border-white/[0.06] rounded-xl p-6 hover:border-cyan-400/20 transition-all duration-700 ${
+                  visibleSections.certifications
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}
+                style={{ transitionDelay: `${index * 120 + 150}ms` }}
+              >
+                <div className="flex items-start gap-4 flex-1">
+                  <div className="w-9 h-9 rounded-full bg-surface border-2 border-cyan-400/25 flex items-center justify-center flex-shrink-0 shadow-[0_0_16px_rgba(34,211,238,0.08)]">
+                    <GraduationCap className="w-4 h-4 text-cyan-400" />
+                  </div>
+                  {/* Título em linha própria: o badge do período nunca é empurrado
+                      pelo comprimento do curso, então os cards ficam alinhados. */}
+                  <div className="min-w-0 flex flex-col flex-1">
+                    <h3 className="font-semibold text-white mb-2">
+                      {item.course}
+                    </h3>
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <p className="text-cyan-400 text-sm font-medium">
+                        {item.institution}
+                      </p>
+                      <span className="text-xs text-muted border border-white/[0.08] bg-white/[0.03] px-3 py-1 rounded-full whitespace-nowrap flex-shrink-0">
+                        {item.period}
+                      </span>
+                    </div>
+                    <p className="text-muted text-sm leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
           <CertificationsCarousel
@@ -1109,7 +1388,7 @@ export default function Home() {
         ref={sectionRefs.contact}
         data-section="contact"
         id="contact"
-        className="py-24 bg-surface relative overflow-hidden"
+        className="py-24 bg-base relative overflow-hidden"
       >
         {/* Pulsing decorative rings */}
         <div
@@ -1148,13 +1427,14 @@ export default function Home() {
             Contato
           </p>
           <h2 className="font-display font-bold text-5xl md:text-6xl text-white leading-tight mb-6">
-            Vamos trabalhar
+            Vamos construir
             <br />
-            <span className="text-gradient">juntos?</span>
+            <span className="text-gradient">algo relevante?</span>
           </h2>
-          <p className="text-muted mb-12 max-w-md mx-auto text-sm leading-relaxed">
-            Aberto a oportunidades, projetos e conversas sobre tecnologia e
-            segurança.
+          <p className="text-muted mb-12 max-w-lg mx-auto text-sm leading-relaxed">
+            Estou aberto a conversar sobre engenharia de software, produtos
+            SaaS, aplicações com Inteligência Artificial, arquitetura de
+            sistemas e novos desafios técnicos.
           </p>
 
           <div className="flex flex-row flex-nowrap w-full sm:w-auto gap-2 sm:gap-4 justify-center">
@@ -1179,7 +1459,7 @@ export default function Home() {
       </section>
 
       {/* ── Footer ──────────────────────────────────────────────────────────── */}
-      <footer className="py-8 border-t border-white/[0.05] bg-base">
+      <footer className="py-8 border-t border-white/[0.05] bg-surface">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-muted text-xs">
           <Image
             src="/images/logo.png"
@@ -1286,6 +1566,11 @@ function ProjectCard({
 
         {/* Content */}
         <div className="p-6 flex flex-col flex-1">
+          {project.category && (
+            <p className="text-cyan-400 text-[10px] font-semibold tracking-widest uppercase mb-2">
+              {project.category}
+            </p>
+          )}
           <h3 className="font-display font-bold text-lg text-white mb-2 group-hover:text-cyan-400 transition-colors duration-300">
             {project.title}
           </h3>
@@ -1314,15 +1599,17 @@ function ProjectCard({
               <ExternalLink className="w-3.5 h-3.5" />
               Demo
             </a>
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-muted text-xs font-medium hover:bg-white/[0.08] hover:text-white transition-all"
-            >
-              <Github className="w-3.5 h-3.5" />
-              Código
-            </a>
+            {project.github && (
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-muted text-xs font-medium hover:bg-white/[0.08] hover:text-white transition-all"
+              >
+                <Github className="w-3.5 h-3.5" />
+                Código
+              </a>
+            )}
           </div>
         </div>
       </div>
@@ -1413,6 +1700,11 @@ const MobileProjectCarousel = ({
                   />
                 </div>
                 <div className="p-5">
+                  {project.category && (
+                    <p className="text-cyan-400 text-[10px] font-semibold tracking-widest uppercase mb-2">
+                      {project.category}
+                    </p>
+                  )}
                   <h3 className="font-display font-bold text-lg text-white mb-2">
                     {project.title}
                   </h3>
@@ -1441,16 +1733,18 @@ const MobileProjectCarousel = ({
                       <ExternalLink className="w-4 h-4" />
                       Demo
                     </a>
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 flex-1 py-3 rounded-xl bg-white/[0.04] border border-white/[0.06] text-muted text-sm font-medium active:bg-white/10 transition-colors"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Github className="w-4 h-4" />
-                      Código
-                    </a>
+                    {project.github && (
+                      <a
+                        href={project.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 flex-1 py-3 rounded-xl bg-white/[0.04] border border-white/[0.06] text-muted text-sm font-medium active:bg-white/10 transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Github className="w-4 h-4" />
+                        Código
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1521,7 +1815,7 @@ const CertificationsCarousel = ({
         <button
           onClick={prevSlide}
           disabled={currentSlide === 0}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-surface border border-white/[0.08] text-muted hover:text-white hover:border-cyan-400/30 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-200"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-base border border-white/[0.08] text-muted hover:text-white hover:border-cyan-400/30 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-200"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -1530,7 +1824,7 @@ const CertificationsCarousel = ({
         <button
           onClick={nextSlide}
           disabled={currentSlide >= maxSlide}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-surface border border-white/[0.08] text-muted hover:text-white hover:border-cyan-400/30 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-200"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-base border border-white/[0.08] text-muted hover:text-white hover:border-cyan-400/30 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-200"
         >
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -1594,7 +1888,7 @@ const CertificationCard = ({
     onClick={onClick}
     style={{ transitionDelay: `${index * 60}ms` }}
   >
-    <div className="bg-surface border border-white/[0.06] rounded-xl overflow-hidden hover:border-cyan-400/25 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] relative">
+    <div className="bg-base border border-white/[0.06] rounded-xl overflow-hidden hover:border-cyan-400/25 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] relative">
       {/* Star badge */}
       <div className="absolute top-3 right-3 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-yellow-400/10 border border-yellow-400/20">
         <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
