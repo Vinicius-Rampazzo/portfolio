@@ -10,9 +10,60 @@
   --font-display: var(--font-syne);
 }
 
+/* ─── Escala tipográfica ────────────────────────────────────────────────────
+   Tipografia é o material principal deste layout, não um detalhe de acabamento.
+   A escala é fluida por viewport para que o título ocupe a largura da tela em
+   qualquer tamanho — é isso que dá a presença editorial das referências.      */
+:root {
+  --type-display: clamp(2.75rem, 13vw, 15rem);
+  --type-headline: clamp(2rem, 6vw, 5rem);
+  --type-title: clamp(1.5rem, 3.2vw, 2.75rem);
+  --type-lead: clamp(1.0625rem, 1.9vw, 1.75rem);
+  --type-body: 1rem;
+  --type-label: 0.6875rem;
+}
+
+.type-display {
+  font-family: var(--font-display);
+  font-size: var(--type-display);
+  font-weight: 800;
+  line-height: 0.86;
+  letter-spacing: -0.035em;
+}
+
+.type-headline {
+  font-family: var(--font-display);
+  font-size: var(--type-headline);
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: -0.025em;
+}
+
+.type-title {
+  font-family: var(--font-display);
+  font-size: var(--type-title);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.type-lead {
+  font-size: var(--type-lead);
+  line-height: 1.45;
+  font-weight: 300;
+}
+
+.type-label {
+  font-size: var(--type-label);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
 /* ─── Reset & Base ──────────────────────────────────────────── */
 html {
-  scroll-behavior: smooth;
+  /* O scroll suave é do Lenis. Deixar o nativo ligado junto faz os dois
+     disputarem a posição e o resultado é um solavanco a cada âncora. */
   scroll-padding-top: 4rem;
 }
 
@@ -284,3 +335,64 @@ body {
   100% { transform: translateY(380px); opacity: 0; }
 }
 .timeline-travel { animation: timeline-travel 4s ease-in-out infinite 1s; }
+
+/* ─── Acessibilidade: respeitar quem pediu menos movimento ──────────────────
+   O site usa animação de forma intensa (CSS, GSAP, Motion, Anime e WebGL).
+   Este bloco desliga a camada CSS; a camada JavaScript consulta o hook
+   useReducedMotion e aplica o estado final direto, sem tween.
+   As cenas Three.js nem chegam a montar (ver useCanRender3D).             */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Elementos cuja única função é o movimento perpétuo somem em vez de
+     congelar numa pose arbitrária no meio do caminho. */
+  .scan,
+  .scan-v,
+  .radar-sweep,
+  .timeline-travel,
+  .code-float {
+    display: none !important;
+  }
+}
+
+/* ─── Cursor ────────────────────────────────────────────────────────────────
+   Não existe propriedade CSS para tingir o cursor do sistema, então ele é
+   substituído por um SVG na cor da marca. Continua sendo o cursor do SO:
+   desenhado pelo compositor, sem JavaScript no caminho e sem o atraso de um
+   ponteiro perseguido por animação.
+   Os números após a URL são o hotspot — o pixel que de fato clica.          */
+@media (pointer: fine) {
+  body {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M5 2.5 L5 19 L9.2 15.2 L11.9 21.2 L14.6 20 L11.9 14.2 L17.5 14.2 Z' fill='%2322d3ee' stroke='%23080808' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E")
+        4 2,
+      auto;
+  }
+
+  a,
+  button,
+  [role="button"],
+  summary,
+  label,
+  [data-magnetic] {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Ccircle cx='13' cy='13' r='6.5' fill='none' stroke='%2322d3ee' stroke-width='2'/%3E%3Ccircle cx='13' cy='13' r='2' fill='%2322d3ee'/%3E%3C/svg%3E")
+        13 13,
+      pointer;
+  }
+}
+
+/* Alvos marcados continuam reagindo ao ponteiro — mas por CSS, sem script. */
+[data-magnetic] {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  [data-magnetic]:hover {
+    transform: scale(1.04);
+  }
+}
