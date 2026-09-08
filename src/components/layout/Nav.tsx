@@ -378,18 +378,10 @@ export function Nav({ activeSection, isOpen, onToggle, onNavigate }: NavProps) {
                 </div>
               </div>
 
-              <div data-menu-block className="col-span-2">
-                <p className="type-label text-muted/40 mb-4">Contato</p>
-                <a
-                  data-magnetic
-                  href="mailto:vinicius_rampazzo10@hotmail.com"
-                  tabIndex={isOpen ? 0 : -1}
-                  className="type-label text-white hover:text-cyan-400 transition-colors duration-300 break-all"
-                >
-                  vinicius_rampazzo10@hotmail.com
-                </a>
-              </div>
-
+              {/* O bloco de contato saiu daqui: o endereço é uma palavra só de
+                  31 caracteres e, na largura do menu no celular, ele quebrava
+                  no meio. O e-mail continua na seção de Contato e no rodapé,
+                  que é onde ele tem espaço para ser lido. */}
             </div>
           </div>
 
