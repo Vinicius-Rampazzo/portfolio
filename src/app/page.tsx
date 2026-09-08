@@ -18,6 +18,7 @@ import { Education } from "@/components/sections/Education";
 import { Contact } from "@/components/sections/Contact";
 
 import { CertificationModal } from "@/components/ui/CertificationModal";
+import { Cursor } from "@/components/ui/Cursor";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import {
   useScrollLock,
@@ -31,6 +32,9 @@ export default function Home() {
   const [selectedCertification, setSelectedCertification] =
     useState<Certification | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // A entrada do Hero só faz sentido depois que a cortina sai — senão ela
+  // acontece por baixo dela e o visitante chega numa tela já parada.
+  const [introDone, setIntroDone] = useState(false);
 
   // A ordem das chaves espelha a ordem visual das seções — o scroll-spy e a
   // navegação por âncora dependem dela.
@@ -60,7 +64,14 @@ export default function Home() {
     <div className="min-h-screen bg-base text-white overflow-x-hidden">
       {/* Depois da intro as alturas mudaram: sem este refresh os gatilhos de
           scroll ficam ancorados nas posições de antes. */}
-      <Intro onFinish={() => ScrollTrigger.refresh()} />
+      <Intro
+        onFinish={() => {
+          setIntroDone(true);
+          ScrollTrigger.refresh();
+        }}
+      />
+
+      <Cursor />
 
       <SectionCounter activeSection={activeSection} />
 
@@ -71,7 +82,11 @@ export default function Home() {
         onNavigate={scrollToSection}
       />
 
-      <Hero sectionRef={sectionRefs.hero} onNavigate={scrollToSection} />
+      <Hero
+        sectionRef={sectionRefs.hero}
+        onNavigate={scrollToSection}
+        ready={introDone}
+      />
       <Pillars sectionRef={sectionRefs.value} />
       <Projects sectionRef={sectionRefs.projects} />
       <Awards sectionRef={sectionRefs.awards} />

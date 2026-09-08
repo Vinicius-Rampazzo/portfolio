@@ -53,6 +53,8 @@ export function Pillars({ sectionRef }: SectionProps) {
               {/* A imagem troca de lado a cada pilar, criando o ziguezague que
                   dá ritmo à seção sem precisar de nenhum elemento extra. */}
               <div
+                data-cursor
+                data-cursor-label="galeria"
                 className={`relative overflow-hidden aspect-[4/3] bg-base ${
                   flipped ? "md:order-2" : ""
                 }`}

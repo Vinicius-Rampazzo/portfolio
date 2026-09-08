@@ -64,11 +64,31 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
+/**
+ * Prepara a abertura ANTES do primeiro paint.
+ *
+ * A cortina é renderizada no HTML do servidor; este script roda de forma
+ * síncrona no <head> — portanto antes de qualquer pixel do <body> — e marca o
+ * <html>, de onde o CSS a esconde na hora quando ela não deve tocar. É o que
+ * elimina o relance da página por baixo da cortina.
+ *
+ * Toca em toda visita, inclusive a cada F5: a única dispensa é `prefers-
+ * reduced-motion`. E como a abertura recomeça, a página também recomeça —
+ * `scrollRestoration = manual` impede o navegador de devolver o visitante ao
+ * ponto em que ele estava antes de atualizar.
+ */
+const INTRO_GATE = `try{if('scrollRestoration' in history)history.scrollRestoration='manual';window.scrollTo(0,0);var r=matchMedia('(prefers-reduced-motion: reduce)').matches;document.documentElement.dataset.intro=r?'skip':'play'}catch(e){document.documentElement.dataset.intro='skip'}`;
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR">
+    // O script acima muta um atributo do <html>: sem isto o React reclama de
+    // divergência entre o HTML do servidor e o do cliente.
+    <html lang="pt-BR" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: INTRO_GATE }} />
+      </head>
       <body className={`${syne.variable} ${inter.variable} antialiased`}>
         {children}
       </body>

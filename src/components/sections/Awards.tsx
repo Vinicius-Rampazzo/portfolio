@@ -38,7 +38,11 @@ export function Awards({ sectionRef }: SectionProps) {
               className="group grid gap-10 md:grid-cols-2 md:gap-16 lg:gap-24 items-center"
             >
               <div className={`relative ${flipped ? "md:order-2" : ""}`}>
-                <div className="relative aspect-[4/5] overflow-hidden">
+                <div
+                  data-cursor
+                  data-cursor-label="galeria"
+                  className="relative aspect-[4/5] overflow-hidden"
+                >
                   {/* Sem véu escuro: o texto vive ao lado, não sobre a foto,
                       então não há razão para degradar a imagem — foi a queixa
                       da rodada passada em Projetos. */}

@@ -209,7 +209,7 @@ Vinicius Rampazzo
 🌐 Website: Seu Portfolio
 💼 LinkedIn: vinicius-rampazzo-web-developer
 🐙 GitHub: Vinicius-Rampazzo
-📧 Email: vinicius_rampazzo@hotmail.com
+📧 Email: vinicius_rampazzo10@hotmail.com
 📍 Localização: Presidente Prudente, SP - Brasil
 
 
