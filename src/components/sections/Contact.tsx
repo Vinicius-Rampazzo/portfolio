@@ -4,7 +4,12 @@ import { ArrowUpRight } from "lucide-react";
 import { useSectionReveal } from "@/hooks/useSectionReveal";
 import type { SectionProps } from "./types";
 
-const EMAIL = "vinicius_rampazzo@hotmail.com";
+const EMAIL = "vinicius_rampazzo10@hotmail.com";
+
+// O endereço é uma palavra só de 29 caracteres: numa tela de celular ele não
+// cabe numa linha, e a quebra automática partia no meio de "hotmail.com".
+// Separado aqui, a única quebra possível é depois do "@".
+const [EMAIL_USUARIO, EMAIL_DOMINIO] = EMAIL.split("@");
 
 export function Contact({ sectionRef }: SectionProps) {
   useSectionReveal(sectionRef, { y: 48 });
@@ -35,12 +40,17 @@ export function Contact({ sectionRef }: SectionProps) {
           data-reveal
           data-magnetic
           href={`mailto:${EMAIL}`}
-          className="group inline-flex items-start gap-4 mb-16 max-w-full"
+          className="group inline-flex items-start gap-1 md:gap-4 mb-16 max-w-full"
         >
-          <span className="type-title text-white break-all group-hover:text-cyan-400 transition-colors duration-500 border-b border-white/20 group-hover:border-cyan-400 pb-3">
-            {EMAIL}
+          {/* Sem sublinhado: o traço do bloco de baixo já fecha o e-mail, e os
+              dois juntos viravam duas linhas quase coladas.
+              A escala cai mais rápido que a do type-title no celular — ali o
+              piso de 1,5rem daquela escala não deixava o endereço caber. */}
+          <span className="type-title type-email text-white group-hover:text-cyan-400 transition-colors duration-500">
+            {EMAIL_USUARIO}@<wbr />
+            {EMAIL_DOMINIO}
           </span>
-          <ArrowUpRight className="w-6 h-6 md:w-8 md:h-8 text-muted flex-shrink-0 mt-1 transition-all duration-500 group-hover:text-cyan-400 group-hover:translate-x-1 group-hover:-translate-y-1" />
+          <ArrowUpRight className="w-4 h-4 md:w-8 md:h-8 text-muted flex-shrink-0 mt-1 transition-all duration-500 group-hover:text-cyan-400 group-hover:translate-x-1 group-hover:-translate-y-1" />
         </a>
 
         <div

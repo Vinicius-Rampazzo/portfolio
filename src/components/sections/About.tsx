@@ -8,7 +8,7 @@ import { useMotionEnabled } from "@/hooks/useMediaQuery";
 import { useColorShift, shiftVars } from "@/hooks/useColorShift";
 import { Counter } from "@/components/ui/Counter";
 import { ParallaxGallery } from "@/components/ui/ParallaxGallery";
-import { aboutGallery } from "@/data/gallery";
+import { aboutGallery, aboutGalleryCaption } from "@/data/gallery";
 import type { SectionProps } from "./types";
 
 const STATS = [
@@ -131,7 +131,7 @@ export function About({ sectionRef }: SectionProps) {
 
       {/* Faixa 2 — imagens, largura total */}
       <div className="px-6 md:px-10 my-20 md:my-28">
-        <ParallaxGallery images={aboutGallery} />
+        <ParallaxGallery images={aboutGallery} caption={aboutGalleryCaption} />
       </div>
 
       {/* Faixa 3 — métricas em linha */}

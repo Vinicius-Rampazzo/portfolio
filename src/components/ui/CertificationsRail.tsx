@@ -60,7 +60,16 @@ export function CertificationsRail({
   };
 
   // Arrastar com o ponteiro, como se pega uma pilha de cartas na mesa.
-  const drag = useRef({ active: false, startX: 0, startScroll: 0, moved: 0 });
+  const drag = useRef({
+    active: false,
+    startX: 0,
+    startScroll: 0,
+    moved: 0,
+    captured: false,
+  });
+
+  /** Abaixo disto o gesto ainda é um clique, não um arrasto. */
+  const LIMIAR = 6;
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     const rail = railRef.current;
@@ -70,15 +79,33 @@ export function CertificationsRail({
       startX: event.clientX,
       startScroll: rail.scrollLeft,
       moved: 0,
+      captured: false,
     };
-    rail.setPointerCapture(event.pointerId);
   };
 
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     const rail = railRef.current;
     if (!rail || !drag.current.active) return;
+
     const delta = event.clientX - drag.current.startX;
     drag.current.moved = Math.abs(delta);
+
+    if (!drag.current.captured) {
+      if (drag.current.moved <= LIMIAR) return;
+
+      // A captura só acontece quando o gesto vira arrasto de verdade.
+      // Capturar já no pointerdown era o que impedia abrir o certificado: com
+      // o ponteiro capturado, o navegador entrega o `click` ao elemento que
+      // capturou — o trilho — e nunca ao cartão.
+      rail.setPointerCapture(event.pointerId);
+      drag.current.captured = true;
+
+      // E o snap é o que travava o arrasto: a cada `scrollLeft` que o
+      // ponteiro escrevia, o navegador puxava a posição de volta para o ponto
+      // de encaixe. Desligado durante o gesto, o trilho acompanha a mão.
+      rail.style.scrollSnapType = "none";
+    }
+
     rail.scrollLeft = drag.current.startScroll - delta;
   };
 
@@ -86,7 +113,9 @@ export function CertificationsRail({
     const rail = railRef.current;
     if (rail?.hasPointerCapture(event.pointerId))
       rail.releasePointerCapture(event.pointerId);
+    if (rail && drag.current.captured) rail.style.scrollSnapType = "";
     drag.current.active = false;
+    drag.current.captured = false;
   };
 
   return (
@@ -94,7 +123,9 @@ export function CertificationsRail({
       <div
         ref={railRef}
         // O snap mantém o cartão enquadrado seja qual for a forma de navegar.
-        className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-6 px-6 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden cursor-grab active:cursor-grabbing"
+        // `proximity` e não `mandatory`: com o encaixe obrigatório, soltar o
+        // arrasto no meio do caminho dava um pulo até o cartão vizinho.
+        className="flex gap-6 overflow-x-auto snap-x snap-proximity pb-6 px-6 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden cursor-grab active:cursor-grabbing"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
@@ -105,9 +136,11 @@ export function CertificationsRail({
             key={certification.id}
             data-cert-card
             data-magnetic
+            data-cursor
+            data-cursor-label="clique"
             onClick={() => {
               // Um arrasto que termina sobre um cartão não deve abrir o modal.
-              if (drag.current.moved > 6) return;
+              if (drag.current.moved > LIMIAR) return;
               onSelect(certification);
             }}
             className="group shrink-0 w-[78vw] sm:w-[44vw] lg:w-[27vw] xl:w-[22vw] snap-start text-left"

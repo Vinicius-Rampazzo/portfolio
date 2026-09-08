@@ -15,19 +15,31 @@ const HeroObject = dynamic(
 type HeroProps = {
   sectionRef: React.RefObject<HTMLElement | null>;
   onNavigate: (target: "projects" | "contact") => void;
+  /** `false` enquanto a cortina de abertura ainda cobre a tela. */
+  ready: boolean;
 };
 
-export function Hero({ sectionRef, onNavigate }: HeroProps) {
+export function Hero({ sectionRef, onNavigate, ready }: HeroProps) {
   const nameRef = useRef<HTMLHeadingElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);
   const motionEnabled = useMotionEnabled();
   const canRender3D = useCanRender3D();
 
+  // Entrada — espera a cortina. Antes disso o conteúdo fica na pose de
+  // partida: se ficasse em repouso, a cortina sairia revelando uma tela
+  // pronta que logo em seguida se desmontaria para animar de novo.
   useGSAP(
     () => {
       if (!motionEnabled || !nameRef.current) return;
 
       const lines = nameRef.current.querySelectorAll("[data-name-line]");
+      const meta = metaRef.current?.querySelectorAll("[data-hero-meta]") ?? [];
+
+      if (!ready) {
+        gsap.set(lines, { yPercent: 105 });
+        gsap.set(meta, { opacity: 0, y: 18 });
+        return;
+      }
 
       // Cada linha do nome vive dentro de um contêiner com overflow oculto,
       // então subir a partir de yPercent 105 produz a revelação por máscara —
@@ -35,23 +47,33 @@ export function Hero({ sectionRef, onNavigate }: HeroProps) {
       const intro = gsap.timeline({ delay: 0.15 });
 
       intro
-        .from(lines, {
-          yPercent: 105,
+        .to(lines, {
+          yPercent: 0,
           duration: 1.15,
           ease: "expo.out",
           stagger: 0.09,
         })
-        .from(
-          metaRef.current?.querySelectorAll("[data-hero-meta]") ?? [],
+        .to(
+          meta,
           {
-            opacity: 0,
-            y: 18,
+            opacity: 1,
+            y: 0,
             duration: 0.8,
             ease: "power3.out",
             stagger: 0.08,
           },
           "-=0.6"
         );
+
+      return () => intro.kill();
+    },
+    { dependencies: [motionEnabled, ready], scope: sectionRef }
+  );
+
+  // Saída por scroll — independe da cortina.
+  useGSAP(
+    () => {
+      if (!motionEnabled || !nameRef.current) return;
 
       // O nome sobe e desaparece antes da próxima seção chegar.
       const exit = gsap.to(nameRef.current, {
@@ -67,7 +89,6 @@ export function Hero({ sectionRef, onNavigate }: HeroProps) {
       });
 
       return () => {
-        intro.kill();
         exit.scrollTrigger?.kill();
         exit.kill();
       };

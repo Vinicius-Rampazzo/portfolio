@@ -25,8 +25,11 @@ export const CertificationModal = ({
   }, [onClose]);
 
   return (
+    // z-[200] e não z-50: a Nav vive em z-[100] e o contador de seções em
+    // z-[70], então no valor antigo o logo e o botão do menu flutuavam por
+    // cima do certificado ampliado. Fica abaixo da cortina de abertura (300).
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/88 backdrop-blur-md"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/88 backdrop-blur-md"
       onClick={onClose}
     >
       <div

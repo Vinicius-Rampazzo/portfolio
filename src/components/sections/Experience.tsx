@@ -11,6 +11,7 @@ import type { SectionProps } from "./types";
 export function Experience({ sectionRef }: SectionProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLSpanElement>(null);
   const motionEnabled = useMotionEnabled();
 
   useGSAP(
@@ -25,37 +26,107 @@ export function Experience({ sectionRef }: SectionProps) {
       media.add("(min-width: 768px)", () => {
         if (overflow() <= 0) return;
 
-        const tween = gsap.to(track, {
-          x: () => -overflow(),
-          ease: "none",
-          scrollTrigger: {
-            id: "experience-rail",
-            trigger: sectionRef.current,
-            start: "top top",
-            end: () => "+=" + overflow(),
-            scrub: 0.8,
-            pin: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            // Um ponto de parada por experiência: soltar o scroll assenta
-            // sempre com um painel enquadrado, nunca no meio de dois.
-            snap: {
-              snapTo: 1 / (experiences.length - 1),
-              duration: { min: 0.15, max: 0.45 },
-              delay: 0.05,
-              ease: "power2.inOut",
+        const skewTo = gsap.quickTo(track, "skewX", {
+          duration: 0.4,
+          ease: "power3",
+        });
+
+        // Sentido contrário ao da Stack Técnica: lá o trilho corre para a
+        // esquerda e os painéis chegam pela direita; aqui ele corre para a
+        // direita e a trajetória chega pela esquerda. O `flex-row-reverse`
+        // é o que mantém a ordem de leitura — o título fica na ponta
+        // direita, que é onde a seção começa, e cada experiência entra
+        // depois dele pela borda esquerda.
+        const rail = gsap.fromTo(
+          track,
+          { x: () => -overflow() },
+          {
+            x: 0,
+            ease: "none",
+            scrollTrigger: {
+              id: "experience-rail",
+              trigger: sectionRef.current,
+              start: "top top",
+              end: () => "+=" + overflow(),
+              scrub: 1,
+              pin: true,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+              onUpdate: (self) => {
+                skewTo(gsap.utils.clamp(-2.5, 2.5, self.getVelocity() / 900));
+                if (progressRef.current) {
+                  gsap.set(progressRef.current, { scaleX: self.progress });
+                }
+              },
+              onScrubComplete: () => skewTo(0),
             },
-          },
+          }
+        );
+
+        const panels = gsap.utils.toArray<HTMLElement>(
+          track.querySelectorAll("[data-card]")
+        );
+
+        const panelTweens = panels.flatMap((panel) => {
+          const body = panel.querySelector("[data-panel-body]");
+          const year = panel.querySelector("[data-panel-year]");
+          if (!body) return [];
+
+          // O painel entra pela borda esquerda, então o gatilho é a borda
+          // DIREITA dele cruzando a tela — é o lado que aparece primeiro.
+          const enter = gsap.fromTo(
+            body,
+            { autoAlpha: 0.15, x: -40 },
+            {
+              autoAlpha: 1,
+              x: 0,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: panel,
+                containerAnimation: rail,
+                start: "right left",
+                end: "right 55%",
+                scrub: true,
+              },
+            }
+          );
+
+          // O ano gigante corre em velocidade própria: é o que dá
+          // profundidade a um painel que é só tipografia.
+          const drift = year
+            ? gsap.fromTo(
+                year,
+                { xPercent: -8 },
+                {
+                  xPercent: 8,
+                  ease: "none",
+                  scrollTrigger: {
+                    trigger: panel,
+                    containerAnimation: rail,
+                    start: "right left",
+                    end: "left right",
+                    scrub: true,
+                  },
+                }
+              )
+            : null;
+
+          return drift ? [enter, drift] : [enter];
         });
 
         return () => {
-          tween.scrollTrigger?.kill();
-          tween.kill();
+          [rail, ...panelTweens].forEach((t) => {
+            t.scrollTrigger?.kill();
+            t.kill();
+          });
+          gsap.set(track, { skewX: 0, x: 0 });
         };
       });
 
       media.add("(max-width: 767px)", () => {
-        const cards = gsap.utils.toArray<HTMLElement>(track.children);
+        const cards = gsap.utils.toArray<HTMLElement>(
+          track.querySelectorAll("[data-card]")
+        );
         const tweens = cards.map((card) =>
           gsap.from(card, {
             opacity: 0,
@@ -82,21 +153,32 @@ export function Experience({ sectionRef }: SectionProps) {
       ref={sectionRef}
       data-section="experience"
       id="experience"
-      className="relative bg-base py-28 md:py-0 md:h-[100svh] md:flex md:flex-col md:justify-center overflow-hidden"
+      className="relative bg-base py-28 md:py-0 md:h-[100svh] overflow-hidden"
     >
-      <header className="px-6 md:px-10 mb-16 md:mb-14 max-w-4xl">
-        <p className="type-label text-cyan-400 mb-6">Trajetória</p>
-        <h2 className="type-headline text-white">
-          Experiência
-          <span className="text-muted font-light"> profissional</span>
-        </h2>
-      </header>
-
-      <div ref={viewportRef} className="md:overflow-hidden">
+      {/* Como na Stack Técnica: a faixa superior fica livre para a Nav, e
+          nada do trilho sobe até a altura do wordmark. */}
+      <div
+        ref={viewportRef}
+        className="md:h-full md:overflow-hidden md:pt-[clamp(7.5rem,13vh,10rem)] md:pb-[clamp(3.5rem,7vh,5rem)]"
+      >
         <div
           ref={trackRef}
-          className="flex flex-col gap-16 px-6 md:px-10 md:flex-row md:gap-[5vw] md:w-max md:pr-[calc(100vw-62vw-2.5rem)]"
+          className="flex flex-col gap-16 px-6 md:px-10 md:h-full md:flex-row-reverse md:gap-[4vw] md:w-max md:pl-[12vw]"
         >
+          <header className="flex-shrink-0 max-w-4xl md:h-full md:w-[min(42vw,30rem)] md:flex md:flex-col md:justify-center">
+            <p className="type-label text-cyan-400 mb-6">Trajetória</p>
+            <h2
+              className="type-headline text-white"
+              style={{ fontSize: "clamp(2rem, 4vw, 3.25rem)" }}
+            >
+              Experiência
+              <span className="text-muted font-light"> profissional</span>
+            </h2>
+            <p className="hidden md:block text-muted text-sm mt-8 max-w-xs leading-relaxed">
+              Três frentes — role para o lado.
+            </p>
+          </header>
+
           {experiences.map((exp, index) => {
             const paragraphs = Array.isArray(exp.description)
               ? exp.description
@@ -105,19 +187,21 @@ export function Experience({ sectionRef }: SectionProps) {
             return (
               <article
                 key={index}
-                className="relative md:w-[62vw] lg:w-[54vw] flex-shrink-0 border-t border-white/15 pt-8"
+                data-card
+                className="relative flex-shrink-0 border-t border-white/15 pt-8 md:h-full md:w-[52vw] lg:w-[44vw] md:flex md:flex-col md:justify-center md:border-t-0 md:pt-0"
               >
                 {/* O ano em números gigantes vira a textura do painel — dá
                     escala sem introduzir nenhum elemento novo. */}
                 <span
+                  data-panel-year
                   aria-hidden
-                  className="pointer-events-none select-none absolute -top-4 right-0 font-display font-extrabold leading-[0.75] text-white/[0.04] whitespace-nowrap"
+                  className="pointer-events-none select-none absolute -top-4 right-0 md:top-0 font-display font-extrabold leading-[0.75] text-white/[0.04] whitespace-nowrap"
                   style={{ fontSize: "clamp(5rem, 13vw, 13rem)" }}
                 >
                   {exp.period.replace(/[^0-9]/g, "").slice(0, 4)}
                 </span>
 
-                <div className="relative z-10">
+                <div data-panel-body className="relative z-10 md:border-t md:border-white/15 md:pt-8">
                   <div className="flex flex-wrap items-center gap-4 mb-7">
                     <span className="type-label text-muted/50 tabular-nums">
                       {String(index + 1).padStart(2, "0")}
@@ -164,6 +248,15 @@ export function Experience({ sectionRef }: SectionProps) {
             );
           })}
         </div>
+      </div>
+
+      {/* A barra cresce da direita para a esquerda, no mesmo sentido do
+          trilho — se crescesse ao contrário, contradiria o movimento. */}
+      <div className="hidden md:block absolute bottom-[clamp(1.5rem,3.5vh,2.5rem)] left-10 right-10 h-px bg-white/10">
+        <span
+          ref={progressRef}
+          className="block h-px bg-cyan-400 origin-right scale-x-0"
+        />
       </div>
     </section>
   );

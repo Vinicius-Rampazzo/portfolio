@@ -47,6 +47,25 @@
   letter-spacing: -0.02em;
 }
 
+/* O e-mail do fechamento é uma palavra só de 31 caracteres, e no celular ele
+   precisa caber numa linha.
+   O tamanho sai da largura disponível, não de um palpite: medido no canvas, o
+   endereço ocupa 17,3px de largura para cada 1px de corpo da fonte. Descontando
+   os 48px de respiro lateral e os 20px da seta, sobra `100vw - 68px` — dividir
+   por 18 dá o corpo que cabe com uma folga de ~4%.
+   Acima de 640px o endereço já cabe inteiro e a escala do título volta. */
+.type-email {
+  font-size: min(calc((100vw - 68px) / 18), 1.5rem);
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .type-email {
+    font-size: var(--type-title);
+    white-space: normal;
+  }
+}
+
 .type-lead {
   font-size: var(--type-lead);
   line-height: 1.45;
@@ -65,6 +84,12 @@ html {
   /* O scroll suave é do Lenis. Deixar o nativo ligado junto faz os dois
      disputarem a posição e o resultado é um solavanco a cada âncora. */
   scroll-padding-top: 4rem;
+
+  /* A calha da barra de rolagem fica reservada mesmo quando não há barra.
+     Sem isto, travar o scroll para abrir o menu (overflow: hidden) fazia a
+     barra sumir, a viewport alargar 5px e a página inteira — inclusive os
+     elementos fixos, que se medem pela viewport — pular para a direita. */
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -73,6 +98,36 @@ body {
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Cortina de abertura ───────────────────────────────────────────────────
+   A cortina existe já no HTML do servidor; quem manda nela é o atributo
+   data-intro do <html>, escrito pelo script síncrono do layout antes do
+   primeiro paint. Com isso o visitante recorrente nunca vê um frame de
+   cortina, e o de primeira viagem nunca vê um frame da página por baixo.
+   As poses iniciais ficam aqui, não no JavaScript: entre o HTML chegar e o
+   GSAP carregar existe um intervalo, e nele o elemento precisa já estar na
+   posição de partida da animação.                                          */
+[data-intro-root] {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+}
+
+html[data-intro="skip"] [data-intro-root] {
+  display: none !important;
+}
+
+/* Trava o scroll antes mesmo da hidratação — o Lenis só assume depois. */
+html[data-intro="play"] body {
+  overflow: hidden;
+}
+
+/* As letras entram uma a uma, então quem parte escondido é cada path — não o
+   wordmark inteiro. Escopo no [data-intro-word] para não afetar o wordmark da
+   Nav, que usa o mesmo vetor. */
+[data-intro-word] [data-letter] {
+  opacity: 0;
 }
 
 /* ─── Scrollbar ─────────────────────────────────────────────── */
@@ -384,6 +439,16 @@ body {
     cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Ccircle cx='13' cy='13' r='6.5' fill='none' stroke='%2322d3ee' stroke-width='2'/%3E%3Ccircle cx='13' cy='13' r='2' fill='%2322d3ee'/%3E%3C/svg%3E")
         13 13,
       pointer;
+  }
+}
+
+/* Onde a bola do cursor aparece — só no vídeo do menu —, o ponteiro do
+   sistema sai de cena. O atributo no <html> é escrito pelo componente Cursor
+   apenas quando ele realmente monta: sem essa condição, quem navega com
+   movimento reduzido ou por toque ficaria com o elemento sem cursor nenhum. */
+@media (pointer: fine) {
+  html[data-cursor-active] [data-cursor] {
+    cursor: none;
   }
 }
 
