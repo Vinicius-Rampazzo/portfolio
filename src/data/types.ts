@@ -11,6 +11,8 @@ export type Project = {
   github?: string;
   award?: string;
   imagePosition?: string;
+  /** Recorte no celular, onde o painel em retrato corta as laterais da imagem. */
+  mobileImagePosition?: string;
 };
 
 export type Experience = {

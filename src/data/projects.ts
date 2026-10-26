@@ -1,6 +1,21 @@
 import type { Project } from "./types";
 
 export const projects: Project[] = [
+  {
+    title: "Forensic Guard",
+    category: "Cybersecurity · Forense Digital",
+    description:
+      "Ferramenta de triagem forense que analisa arquivos, imagens, e-mails e links sem nunca abri-los ou executá-los. Detecta executáveis disfarçados pelos magic bytes, calcula hashes e entropia, extrai metadados EXIF e verifica SPF, DKIM e DMARC, gerando um score de risco em que cada indicador traz a evidência que o disparou.",
+    tech: ["Next.js", "TypeScript", "Tailwind CSS", "Python", "FastAPI"],
+    image: "/images/forensicguard.png",
+    demo: "https://forensic-guard-rspd.vercel.app/pt-br",
+    github: "https://github.com/Vinicius-Rampazzo/forensic-guard",
+    // Telas maiores mantêm o logo, à esquerda da arte. No celular, o logo
+    // disputaria espaço com o texto; os circuitos da direita deixam a leitura
+    // limpa.
+    imagePosition: "20% center",
+    mobileImagePosition: "right center",
+  },
   // {
   //   title: "Doc Work",
   //   category: "AI · SaaS · RAG",

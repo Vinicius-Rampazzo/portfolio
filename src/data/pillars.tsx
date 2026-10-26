@@ -57,7 +57,7 @@ export const pillars: Pillar[] = [
     icon: <Shield className="w-6 h-6 text-blue-400" />,
     iconBg: "bg-blue-500/10",
     border: "border-white/[0.06] hover:border-blue-500/30",
-    title: "Security by Design",
+    title: "Security",
     description:
       "Formação em CyberSecurity que complementa a engenharia, com visão voltada à segurança das aplicações, infraestrutura, análise de riscos e confiabilidade.",
     items: [

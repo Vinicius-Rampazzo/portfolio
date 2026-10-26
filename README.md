@@ -96,6 +96,7 @@ Localização e disponibilidade
 
 🚀 Projetos em Destaque
 
+Forensic Guard: Triagem forense de arquivos, imagens, e-mails e links
 ImobiBotBrasil: IA para mercado imobiliário (1º lugar Hackathon 2025)
 Tech Informe: Blog de tecnologia e conhecimento
 Pixel Art: Primeiro projeto na jornada de programação

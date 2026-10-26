@@ -1,13 +1,27 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, type CSSProperties } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { ArrowUpRight, Github, Trophy } from "lucide-react";
 import { gsap } from "@/lib/gsap";
 import { useMotionEnabled } from "@/hooks/useMediaQuery";
 import { projects } from "@/data/projects";
+import type { Project } from "@/data/types";
 import type { SectionProps } from "./types";
+
+/**
+ * Recorte da imagem em variáveis CSS, que as classes responsivas leem.
+ * Com style inline o recorte seria um só; assim o celular tem o seu sem
+ * depender de JavaScript, e o primeiro render já sai certo.
+ */
+function imagePositionVars(project: Project): CSSProperties {
+  const position = project.imagePosition ?? "center center";
+  return {
+    "--image-position": position,
+    "--image-position-mobile": project.mobileImagePosition ?? position,
+  } as CSSProperties;
+}
 
 export function Projects({ sectionRef }: SectionProps) {
   const stackRef = useRef<HTMLDivElement>(null);
@@ -80,10 +94,8 @@ export function Projects({ sectionRef }: SectionProps) {
               alt={project.title}
               fill
               sizes="100vw"
-              className="object-cover"
-              style={{
-                objectPosition: project.imagePosition ?? "center center",
-              }}
+              className="object-cover object-(--image-position-mobile) md:object-(--image-position)"
+              style={imagePositionVars(project)}
               // Alta: são capturas de tela com texto fino, onde a compressão
               // aparece como sujeira nas letras muito antes que numa foto.
               quality={95}

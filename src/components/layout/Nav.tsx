@@ -41,6 +41,19 @@ export const NAV_LINKS: { label: string; section: SectionKey }[] = [
  */
 const LOOP_START = 14;
 
+/**
+ * Corpo dos links do menu. Pela largura ele cresce até 2,6rem, mas em
+ * notebook quem aperta é a ALTURA: a tela larga levava a fonte ao teto e os
+ * nove links passavam do rodapé, empurrando "Contato" para fora da janela.
+ *
+ * O limite vertical sai da conta da coluna. Cada link mede 1,2 × corpo mais
+ * 0,5rem do py-1, e sobra para os nove a janela menos 8rem de respiro (7rem
+ * no topo, onde fica a barra, e 1rem no rodapé):
+ * 9 × (1,2c + 0,5rem) ≤ 100vh − 8rem  →  c ≤ (100vh − 12,5rem) / 10,8.
+ * Arredondado para (100vh − 13rem) / 11, uma folga para não encostar.
+ */
+const LINK_FONT_SIZE = "clamp(1.5rem, min(3vw, (100vh - 13rem) / 11), 2.6rem)";
+
 type NavProps = {
   activeSection: string;
   isOpen: boolean;
@@ -287,7 +300,7 @@ export function Nav({ activeSection, isOpen, onToggle, onNavigate }: NavProps) {
                         ? "text-cyan-400"
                         : "text-white hover:text-cyan-400"
                     }`}
-                    style={{ fontSize: "clamp(1.5rem, 3vw, 2.6rem)" }}
+                    style={{ fontSize: LINK_FONT_SIZE }}
                   >
                     <span className="type-label text-muted/40 tabular-nums w-6 flex-shrink-0">
                       {String(index + 1).padStart(2, "0")}
