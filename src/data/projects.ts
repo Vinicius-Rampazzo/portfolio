@@ -38,13 +38,13 @@ export const projects: Project[] = [
     github: "https://github.com/Vinicius-Rampazzo/ImobiBotBrasil",
     award: "1º Lugar Hackathon 2025",
   },
-  {
-    title: "Tech Informe",
-    category: "Blog · Conteúdo Técnico",
-    description:
-      "Blog colaborativo para compartilhar conhecimento técnico. Múltiplos autores podem hospedar e publicar artigos sobre tecnologia de forma organizada.",
-    tech: ["Next.js", "Tailwind CSS"],
-    image: "/images/techinforme.png",
-    demo: "https://techinforme.com.br/",
-  },
+  // {
+  //   title: "Tech Informe",
+  //   category: "Blog · Conteúdo Técnico",
+  //   description:
+  //     "Blog colaborativo para compartilhar conhecimento técnico. Múltiplos autores podem hospedar e publicar artigos sobre tecnologia de forma organizada.",
+  //   tech: ["Next.js", "Tailwind CSS"],
+  //   image: "/images/techinforme.png",
+  //   demo: "https://techinforme.com.br/",
+  // },
 ];
