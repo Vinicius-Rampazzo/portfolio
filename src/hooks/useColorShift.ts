@@ -4,8 +4,16 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 import { useMotionEnabled } from "./useMediaQuery";
 
+type Theme = { bg: string; fg: string; muted: string };
+
 export const DARK_THEME = { bg: "#080808", fg: "#ffffff", muted: "#8a8f98" };
 export const LIGHT_THEME = { bg: "#f4f2ee", fg: "#0b0b0b", muted: "#5c5c5c" };
+
+function applyTheme(section: HTMLElement, theme: Theme) {
+  section.style.setProperty("--sec-bg", theme.bg);
+  section.style.setProperty("--sec-fg", theme.fg);
+  section.style.setProperty("--sec-muted", theme.muted);
+}
 
 /** Valores iniciais para o `style` da seção — o estado antes de qualquer scroll. */
 export const shiftVars = (theme = DARK_THEME) =>
@@ -39,11 +47,16 @@ export function useColorShift(
       // Sem animação, a seção assume direto a cor de destino: uma seção clara
       // precisa ser clara mesmo para quem desligou o movimento.
       if (!motionEnabled) {
-        section.style.setProperty("--sec-bg", to.bg);
-        section.style.setProperty("--sec-fg", to.fg);
-        section.style.setProperty("--sec-muted", to.muted);
+        applyTheme(section, to);
         return;
       }
+
+      // Enquanto a preferência de movimento não é lida, `motionEnabled` vale
+      // false, e o ramo acima já pintou a seção com a cor de destino. O tween
+      // só escreve quando o scroll alcança o gatilho: sem voltar à cor de
+      // partida aqui, a seção aparecia clara e escurecia de repente bem quando
+      // a transição começava.
+      applyTheme(section, from);
 
       const mixBg = gsap.utils.interpolate(from.bg, to.bg);
       const mixFg = gsap.utils.interpolate(from.fg, to.fg);
@@ -55,9 +68,11 @@ export function useColorShift(
         ease: "none",
         onUpdate: () => {
           const t = progress.value;
-          section.style.setProperty("--sec-bg", mixBg(t));
-          section.style.setProperty("--sec-fg", mixFg(t));
-          section.style.setProperty("--sec-muted", mixMuted(t));
+          applyTheme(section, {
+            bg: mixBg(t),
+            fg: mixFg(t),
+            muted: mixMuted(t),
+          });
         },
         scrollTrigger: {
           trigger: section,
