@@ -13,8 +13,9 @@ import type { Certification } from "@/data/types";
  * faixa autônoma — setas, arrastar com o ponteiro, teclado e barra de
  * progresso — e o scroll da página segue seu caminho normalmente.
  *
- * A rolagem usa `scroll-snap` nativo do CSS, então o comportamento continua
- * correto sem JavaScript e com qualquer forma de entrada.
+ * No toque, a rolagem é nativa e encaixa com `scroll-snap`. Com o mouse, o
+ * trilho para exatamente onde o arrasto soltar, e as setas o realinham
+ * cartão a cartão.
  */
 export function CertificationsRail({
   certifications,
@@ -50,13 +51,31 @@ export function CertificationsRail({
     };
   }, [sync]);
 
-  /** Avança um cartão por vez, medindo o primeiro item em vez de chutar. */
+  /**
+   * Vai ao próximo cartão (ou ao anterior) e o encosta na margem da página.
+   *
+   * O destino é calculado, não somado: depois de um arrasto o trilho pode ter
+   * parado no meio de um cartão, e rolar a largura de um cartão a partir dali
+   * o deixaria desalinhado dali em diante.
+   */
   const step = (direction: 1 | -1) => {
     const rail = railRef.current;
     if (!rail) return;
-    const card = rail.querySelector<HTMLElement>("[data-cert-card]");
-    const amount = card ? card.offsetWidth + 24 : rail.clientWidth * 0.8;
-    rail.scrollBy({ left: amount * direction, behavior: "smooth" });
+
+    const gutter = parseFloat(getComputedStyle(rail).paddingLeft);
+    const stops = Array.from(
+      rail.querySelectorAll<HTMLElement>("[data-cert-card]"),
+      (card) => card.offsetLeft - gutter
+    );
+    const current = rail.scrollLeft;
+    const target =
+      direction === 1
+        ? stops.find((stop) => stop > current + 1)
+        : stops.findLast((stop) => stop < current - 1);
+
+    if (target !== undefined) {
+      rail.scrollTo({ left: target, behavior: "smooth" });
+    }
   };
 
   // Arrastar com o ponteiro, como se pega uma pilha de cartas na mesa.
@@ -99,11 +118,6 @@ export function CertificationsRail({
       // capturou — o trilho — e nunca ao cartão.
       rail.setPointerCapture(event.pointerId);
       drag.current.captured = true;
-
-      // E o snap é o que travava o arrasto: a cada `scrollLeft` que o
-      // ponteiro escrevia, o navegador puxava a posição de volta para o ponto
-      // de encaixe. Desligado durante o gesto, o trilho acompanha a mão.
-      rail.style.scrollSnapType = "none";
     }
 
     rail.scrollLeft = drag.current.startScroll - delta;
@@ -113,7 +127,6 @@ export function CertificationsRail({
     const rail = railRef.current;
     if (rail?.hasPointerCapture(event.pointerId))
       rail.releasePointerCapture(event.pointerId);
-    if (rail && drag.current.captured) rail.style.scrollSnapType = "";
     drag.current.active = false;
     drag.current.captured = false;
   };
@@ -122,27 +135,38 @@ export function CertificationsRail({
     <div>
       <div
         ref={railRef}
-        // O snap mantém o cartão enquadrado seja qual for a forma de navegar.
-        // `proximity` e não `mandatory`: com o encaixe obrigatório, soltar o
-        // arrasto no meio do caminho dava um pulo até o cartão vizinho.
-        className="flex gap-6 overflow-x-auto snap-x snap-proximity pb-6 px-6 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden cursor-grab active:cursor-grabbing"
+        // Snap só no toque, onde a rolagem é do próprio sistema. Com o mouse
+        // ele brigava com o arrasto: desligado durante o gesto e religado ao
+        // soltar, fazia o navegador reencaixar na hora, e o trilho pulava para
+        // longe de onde a mão o deixou. `scroll-px` alinha o encaixe à margem
+        // da página, não à borda da tela. `relative` é a referência do
+        // `offsetLeft` dos cartões em `step`.
+        //
+        // Sem a bola do `data-cursor`: aqui quem fala é a mão, aberta no
+        // hover e fechada no arrasto. A bola esconde o ponteiro do sistema, e
+        // com ela a mão sumia.
+        className="relative flex gap-6 overflow-x-auto pointer-coarse:snap-x pointer-coarse:snap-proximity scroll-px-6 md:scroll-px-10 pb-6 px-6 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden cursor-grab active:cursor-grabbing"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
       >
         {certifications.map((certification) => (
+          // Sem `data-magnetic`: a escala de hover crescia o cartão inteiro
+          // para fora do trilho, que cortava o topo, e fazia cada cartão
+          // pulsar ao passar sob o ponteiro durante o arrasto. O zoom da
+          // imagem já dá o retorno de hover.
           <button
             key={certification.id}
             data-cert-card
-            data-magnetic
-            data-cursor
-            data-cursor-label="clique"
             onClick={() => {
               // Um arrasto que termina sobre um cartão não deve abrir o modal.
               if (drag.current.moved > LIMIAR) return;
               onSelect(certification);
             }}
+            // Herda a mão do trilho. Sem isto vale o cursor de anel que o
+            // globals.css dá a todo <button>, e a mão só aparecia nos vãos.
+            style={{ cursor: "inherit" }}
             className="group shrink-0 w-[78vw] sm:w-[44vw] lg:w-[27vw] xl:w-[22vw] snap-start text-left"
           >
             <div className="relative overflow-hidden rounded-sm bg-black/5 aspect-[16/11] mb-4">
